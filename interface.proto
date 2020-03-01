@@ -1,0 +1,20 @@
+
+syntax = "proto3";
+
+package comm;
+
+service ImageService {
+    rpc get_img_by_idx (IdxRequest) returns (ImgReply) {}
+}
+
+message IdxRequest {
+    int32 num = 1;
+}
+
+
+message ImgReply {
+    bytes data = 1;
+    repeated int32 shape = 2;
+    int32 label = 3;
+    string dtype = 4;
+}
