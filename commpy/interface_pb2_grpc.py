@@ -19,6 +19,11 @@ class ImageServiceStub(object):
         request_serializer=interface__pb2.IdxRequest.SerializeToString,
         response_deserializer=interface__pb2.ImgReply.FromString,
         )
+    self.get_batch = channel.unary_unary(
+        '/comm.ImageService/get_batch',
+        request_serializer=interface__pb2.BatchRequest.SerializeToString,
+        response_deserializer=interface__pb2.BatchReply.FromString,
+        )
 
 
 class ImageServiceServicer(object):
@@ -32,6 +37,13 @@ class ImageServiceServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def get_batch(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_ImageServiceServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -39,6 +51,11 @@ def add_ImageServiceServicer_to_server(servicer, server):
           servicer.get_img_by_idx,
           request_deserializer=interface__pb2.IdxRequest.FromString,
           response_serializer=interface__pb2.ImgReply.SerializeToString,
+      ),
+      'get_batch': grpc.unary_unary_rpc_method_handler(
+          servicer.get_batch,
+          request_deserializer=interface__pb2.BatchRequest.FromString,
+          response_serializer=interface__pb2.BatchReply.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

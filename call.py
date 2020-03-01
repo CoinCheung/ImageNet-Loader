@@ -8,7 +8,7 @@ import grpc
 import numpy as np
 import cv2
 
-from commpy.interface_pb2 import IdxRequest
+from commpy.interface_pb2 import IdxRequest, BatchRequest
 from commpy.interface_pb2_grpc import ImageServiceStub
 
 
@@ -26,7 +26,7 @@ def get_image():
     return data1
 
 
-def run():
+def run_get_by_idx():
     with grpc.insecure_channel(
             'localhost:50001',
             options=[
@@ -45,7 +45,29 @@ def run():
         print(res[:4, :4, :].ravel())
 
 
+def run_get_batch():
+    with grpc.insecure_channel(
+            'localhost:50001',
+            options=[
+                ('grpc.max_receive_message_length', 1 << 28),
+                ('grpc.max_send_message_length', 1 << 28),
+            ]
+        ) as channel:
+        stub = ImageServiceStub(channel)
+
+        req = BatchRequest(batchsize=256)
+        print('after call')
+        reply = stub.get_batch(req)
+
+        ims = np.frombuffer(
+                reply.data, dtype=reply.dtype).reshape(reply.shape)
+        lbs = np.array(reply.labels)
+        print(ims.shape)
+        print(ims[:4, :4, :4, 0].ravel())
+        print(lbs[:4])
+
 
 if __name__ == "__main__":
     logging.basicConfig()
-    run()
+    #  run_get_by_idx()
+    run_get_batch()

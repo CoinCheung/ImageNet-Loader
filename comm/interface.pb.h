@@ -47,7 +47,7 @@ struct TableStruct_interface_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[2]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -55,6 +55,12 @@ struct TableStruct_interface_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_interface_2eproto;
 namespace comm {
+class BatchReply;
+class BatchReplyDefaultTypeInternal;
+extern BatchReplyDefaultTypeInternal _BatchReply_default_instance_;
+class BatchRequest;
+class BatchRequestDefaultTypeInternal;
+extern BatchRequestDefaultTypeInternal _BatchRequest_default_instance_;
 class IdxRequest;
 class IdxRequestDefaultTypeInternal;
 extern IdxRequestDefaultTypeInternal _IdxRequest_default_instance_;
@@ -63,6 +69,8 @@ class ImgReplyDefaultTypeInternal;
 extern ImgReplyDefaultTypeInternal _ImgReply_default_instance_;
 }  // namespace comm
 PROTOBUF_NAMESPACE_OPEN
+template<> ::comm::BatchReply* Arena::CreateMaybeMessage<::comm::BatchReply>(Arena*);
+template<> ::comm::BatchRequest* Arena::CreateMaybeMessage<::comm::BatchRequest>(Arena*);
 template<> ::comm::IdxRequest* Arena::CreateMaybeMessage<::comm::IdxRequest>(Arena*);
 template<> ::comm::ImgReply* Arena::CreateMaybeMessage<::comm::ImgReply>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
@@ -306,8 +314,8 @@ class ImgReply :
   enum : int {
     kShapeFieldNumber = 2,
     kDataFieldNumber = 1,
-    kDtypeFieldNumber = 4,
-    kLabelFieldNumber = 3,
+    kDtypeFieldNumber = 3,
+    kLabelFieldNumber = 4,
   };
   // repeated int32 shape = 2;
   int shape_size() const;
@@ -347,7 +355,7 @@ class ImgReply :
   std::string* _internal_mutable_data();
   public:
 
-  // string dtype = 4;
+  // string dtype = 3;
   void clear_dtype();
   const std::string& dtype() const;
   void set_dtype(const std::string& value);
@@ -363,13 +371,13 @@ class ImgReply :
   std::string* _internal_mutable_dtype();
   public:
 
-  // int32 label = 3;
+  // int64 label = 4;
   void clear_label();
-  ::PROTOBUF_NAMESPACE_ID::int32 label() const;
-  void set_label(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int64 label() const;
+  void set_label(::PROTOBUF_NAMESPACE_ID::int64 value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_label() const;
-  void _internal_set_label(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_label() const;
+  void _internal_set_label(::PROTOBUF_NAMESPACE_ID::int64 value);
   public:
 
   // @@protoc_insertion_point(class_scope:comm.ImgReply)
@@ -381,7 +389,338 @@ class ImgReply :
   mutable std::atomic<int> _shape_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr dtype_;
-  ::PROTOBUF_NAMESPACE_ID::int32 label_;
+  ::PROTOBUF_NAMESPACE_ID::int64 label_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_interface_2eproto;
+};
+// -------------------------------------------------------------------
+
+class BatchRequest :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:comm.BatchRequest) */ {
+ public:
+  BatchRequest();
+  virtual ~BatchRequest();
+
+  BatchRequest(const BatchRequest& from);
+  BatchRequest(BatchRequest&& from) noexcept
+    : BatchRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline BatchRequest& operator=(const BatchRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline BatchRequest& operator=(BatchRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const BatchRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const BatchRequest* internal_default_instance() {
+    return reinterpret_cast<const BatchRequest*>(
+               &_BatchRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(BatchRequest& a, BatchRequest& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(BatchRequest* other) {
+    if (other == this) return;
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline BatchRequest* New() const final {
+    return CreateMaybeMessage<BatchRequest>(nullptr);
+  }
+
+  BatchRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<BatchRequest>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const BatchRequest& from);
+  void MergeFrom(const BatchRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(BatchRequest* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "comm.BatchRequest";
+  }
+  private:
+  inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_interface_2eproto);
+    return ::descriptor_table_interface_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kBatchsizeFieldNumber = 1,
+  };
+  // int32 batchsize = 1;
+  void clear_batchsize();
+  ::PROTOBUF_NAMESPACE_ID::int32 batchsize() const;
+  void set_batchsize(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_batchsize() const;
+  void _internal_set_batchsize(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:comm.BatchRequest)
+ private:
+  class _Internal;
+
+  ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
+  ::PROTOBUF_NAMESPACE_ID::int32 batchsize_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_interface_2eproto;
+};
+// -------------------------------------------------------------------
+
+class BatchReply :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:comm.BatchReply) */ {
+ public:
+  BatchReply();
+  virtual ~BatchReply();
+
+  BatchReply(const BatchReply& from);
+  BatchReply(BatchReply&& from) noexcept
+    : BatchReply() {
+    *this = ::std::move(from);
+  }
+
+  inline BatchReply& operator=(const BatchReply& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline BatchReply& operator=(BatchReply&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const BatchReply& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const BatchReply* internal_default_instance() {
+    return reinterpret_cast<const BatchReply*>(
+               &_BatchReply_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(BatchReply& a, BatchReply& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(BatchReply* other) {
+    if (other == this) return;
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline BatchReply* New() const final {
+    return CreateMaybeMessage<BatchReply>(nullptr);
+  }
+
+  BatchReply* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<BatchReply>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const BatchReply& from);
+  void MergeFrom(const BatchReply& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(BatchReply* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "comm.BatchReply";
+  }
+  private:
+  inline ::PROTOBUF_NAMESPACE_ID::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_interface_2eproto);
+    return ::descriptor_table_interface_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kShapeFieldNumber = 2,
+    kLabelsFieldNumber = 4,
+    kDataFieldNumber = 1,
+    kDtypeFieldNumber = 3,
+  };
+  // repeated int32 shape = 2;
+  int shape_size() const;
+  private:
+  int _internal_shape_size() const;
+  public:
+  void clear_shape();
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_shape(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      _internal_shape() const;
+  void _internal_add_shape(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      _internal_mutable_shape();
+  public:
+  ::PROTOBUF_NAMESPACE_ID::int32 shape(int index) const;
+  void set_shape(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
+  void add_shape(::PROTOBUF_NAMESPACE_ID::int32 value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      shape() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      mutable_shape();
+
+  // repeated int64 labels = 4;
+  int labels_size() const;
+  private:
+  int _internal_labels_size() const;
+  public:
+  void clear_labels();
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_labels(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >&
+      _internal_labels() const;
+  void _internal_add_labels(::PROTOBUF_NAMESPACE_ID::int64 value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >*
+      _internal_mutable_labels();
+  public:
+  ::PROTOBUF_NAMESPACE_ID::int64 labels(int index) const;
+  void set_labels(int index, ::PROTOBUF_NAMESPACE_ID::int64 value);
+  void add_labels(::PROTOBUF_NAMESPACE_ID::int64 value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >&
+      labels() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >*
+      mutable_labels();
+
+  // bytes data = 1;
+  void clear_data();
+  const std::string& data() const;
+  void set_data(const std::string& value);
+  void set_data(std::string&& value);
+  void set_data(const char* value);
+  void set_data(const void* value, size_t size);
+  std::string* mutable_data();
+  std::string* release_data();
+  void set_allocated_data(std::string* data);
+  private:
+  const std::string& _internal_data() const;
+  void _internal_set_data(const std::string& value);
+  std::string* _internal_mutable_data();
+  public:
+
+  // string dtype = 3;
+  void clear_dtype();
+  const std::string& dtype() const;
+  void set_dtype(const std::string& value);
+  void set_dtype(std::string&& value);
+  void set_dtype(const char* value);
+  void set_dtype(const char* value, size_t size);
+  std::string* mutable_dtype();
+  std::string* release_dtype();
+  void set_allocated_dtype(std::string* dtype);
+  private:
+  const std::string& _internal_dtype() const;
+  void _internal_set_dtype(const std::string& value);
+  std::string* _internal_mutable_dtype();
+  public:
+
+  // @@protoc_insertion_point(class_scope:comm.BatchReply)
+ private:
+  class _Internal;
+
+  ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > shape_;
+  mutable std::atomic<int> _shape_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 > labels_;
+  mutable std::atomic<int> _labels_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr dtype_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_interface_2eproto;
 };
@@ -527,27 +866,7 @@ ImgReply::mutable_shape() {
   return _internal_mutable_shape();
 }
 
-// int32 label = 3;
-inline void ImgReply::clear_label() {
-  label_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 ImgReply::_internal_label() const {
-  return label_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 ImgReply::label() const {
-  // @@protoc_insertion_point(field_get:comm.ImgReply.label)
-  return _internal_label();
-}
-inline void ImgReply::_internal_set_label(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  label_ = value;
-}
-inline void ImgReply::set_label(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_label(value);
-  // @@protoc_insertion_point(field_set:comm.ImgReply.label)
-}
-
-// string dtype = 4;
+// string dtype = 3;
 inline void ImgReply::clear_dtype() {
   dtype_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
@@ -607,9 +926,275 @@ inline void ImgReply::set_allocated_dtype(std::string* dtype) {
   // @@protoc_insertion_point(field_set_allocated:comm.ImgReply.dtype)
 }
 
+// int64 label = 4;
+inline void ImgReply::clear_label() {
+  label_ = PROTOBUF_LONGLONG(0);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 ImgReply::_internal_label() const {
+  return label_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 ImgReply::label() const {
+  // @@protoc_insertion_point(field_get:comm.ImgReply.label)
+  return _internal_label();
+}
+inline void ImgReply::_internal_set_label(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  
+  label_ = value;
+}
+inline void ImgReply::set_label(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  _internal_set_label(value);
+  // @@protoc_insertion_point(field_set:comm.ImgReply.label)
+}
+
+// -------------------------------------------------------------------
+
+// BatchRequest
+
+// int32 batchsize = 1;
+inline void BatchRequest::clear_batchsize() {
+  batchsize_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 BatchRequest::_internal_batchsize() const {
+  return batchsize_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 BatchRequest::batchsize() const {
+  // @@protoc_insertion_point(field_get:comm.BatchRequest.batchsize)
+  return _internal_batchsize();
+}
+inline void BatchRequest::_internal_set_batchsize(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  batchsize_ = value;
+}
+inline void BatchRequest::set_batchsize(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_batchsize(value);
+  // @@protoc_insertion_point(field_set:comm.BatchRequest.batchsize)
+}
+
+// -------------------------------------------------------------------
+
+// BatchReply
+
+// bytes data = 1;
+inline void BatchReply::clear_data() {
+  data_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline const std::string& BatchReply::data() const {
+  // @@protoc_insertion_point(field_get:comm.BatchReply.data)
+  return _internal_data();
+}
+inline void BatchReply::set_data(const std::string& value) {
+  _internal_set_data(value);
+  // @@protoc_insertion_point(field_set:comm.BatchReply.data)
+}
+inline std::string* BatchReply::mutable_data() {
+  // @@protoc_insertion_point(field_mutable:comm.BatchReply.data)
+  return _internal_mutable_data();
+}
+inline const std::string& BatchReply::_internal_data() const {
+  return data_.GetNoArena();
+}
+inline void BatchReply::_internal_set_data(const std::string& value) {
+  
+  data_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void BatchReply::set_data(std::string&& value) {
+  
+  data_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:comm.BatchReply.data)
+}
+inline void BatchReply::set_data(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  data_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:comm.BatchReply.data)
+}
+inline void BatchReply::set_data(const void* value, size_t size) {
+  
+  data_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:comm.BatchReply.data)
+}
+inline std::string* BatchReply::_internal_mutable_data() {
+  
+  return data_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* BatchReply::release_data() {
+  // @@protoc_insertion_point(field_release:comm.BatchReply.data)
+  
+  return data_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void BatchReply::set_allocated_data(std::string* data) {
+  if (data != nullptr) {
+    
+  } else {
+    
+  }
+  data_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), data);
+  // @@protoc_insertion_point(field_set_allocated:comm.BatchReply.data)
+}
+
+// repeated int32 shape = 2;
+inline int BatchReply::_internal_shape_size() const {
+  return shape_.size();
+}
+inline int BatchReply::shape_size() const {
+  return _internal_shape_size();
+}
+inline void BatchReply::clear_shape() {
+  shape_.Clear();
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 BatchReply::_internal_shape(int index) const {
+  return shape_.Get(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 BatchReply::shape(int index) const {
+  // @@protoc_insertion_point(field_get:comm.BatchReply.shape)
+  return _internal_shape(index);
+}
+inline void BatchReply::set_shape(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+  shape_.Set(index, value);
+  // @@protoc_insertion_point(field_set:comm.BatchReply.shape)
+}
+inline void BatchReply::_internal_add_shape(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  shape_.Add(value);
+}
+inline void BatchReply::add_shape(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_add_shape(value);
+  // @@protoc_insertion_point(field_add:comm.BatchReply.shape)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+BatchReply::_internal_shape() const {
+  return shape_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+BatchReply::shape() const {
+  // @@protoc_insertion_point(field_list:comm.BatchReply.shape)
+  return _internal_shape();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+BatchReply::_internal_mutable_shape() {
+  return &shape_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+BatchReply::mutable_shape() {
+  // @@protoc_insertion_point(field_mutable_list:comm.BatchReply.shape)
+  return _internal_mutable_shape();
+}
+
+// string dtype = 3;
+inline void BatchReply::clear_dtype() {
+  dtype_.ClearToEmptyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline const std::string& BatchReply::dtype() const {
+  // @@protoc_insertion_point(field_get:comm.BatchReply.dtype)
+  return _internal_dtype();
+}
+inline void BatchReply::set_dtype(const std::string& value) {
+  _internal_set_dtype(value);
+  // @@protoc_insertion_point(field_set:comm.BatchReply.dtype)
+}
+inline std::string* BatchReply::mutable_dtype() {
+  // @@protoc_insertion_point(field_mutable:comm.BatchReply.dtype)
+  return _internal_mutable_dtype();
+}
+inline const std::string& BatchReply::_internal_dtype() const {
+  return dtype_.GetNoArena();
+}
+inline void BatchReply::_internal_set_dtype(const std::string& value) {
+  
+  dtype_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value);
+}
+inline void BatchReply::set_dtype(std::string&& value) {
+  
+  dtype_.SetNoArena(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:comm.BatchReply.dtype)
+}
+inline void BatchReply::set_dtype(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  dtype_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:comm.BatchReply.dtype)
+}
+inline void BatchReply::set_dtype(const char* value, size_t size) {
+  
+  dtype_.SetNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:comm.BatchReply.dtype)
+}
+inline std::string* BatchReply::_internal_mutable_dtype() {
+  
+  return dtype_.MutableNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline std::string* BatchReply::release_dtype() {
+  // @@protoc_insertion_point(field_release:comm.BatchReply.dtype)
+  
+  return dtype_.ReleaseNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+inline void BatchReply::set_allocated_dtype(std::string* dtype) {
+  if (dtype != nullptr) {
+    
+  } else {
+    
+  }
+  dtype_.SetAllocatedNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), dtype);
+  // @@protoc_insertion_point(field_set_allocated:comm.BatchReply.dtype)
+}
+
+// repeated int64 labels = 4;
+inline int BatchReply::_internal_labels_size() const {
+  return labels_.size();
+}
+inline int BatchReply::labels_size() const {
+  return _internal_labels_size();
+}
+inline void BatchReply::clear_labels() {
+  labels_.Clear();
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 BatchReply::_internal_labels(int index) const {
+  return labels_.Get(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int64 BatchReply::labels(int index) const {
+  // @@protoc_insertion_point(field_get:comm.BatchReply.labels)
+  return _internal_labels(index);
+}
+inline void BatchReply::set_labels(int index, ::PROTOBUF_NAMESPACE_ID::int64 value) {
+  labels_.Set(index, value);
+  // @@protoc_insertion_point(field_set:comm.BatchReply.labels)
+}
+inline void BatchReply::_internal_add_labels(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  labels_.Add(value);
+}
+inline void BatchReply::add_labels(::PROTOBUF_NAMESPACE_ID::int64 value) {
+  _internal_add_labels(value);
+  // @@protoc_insertion_point(field_add:comm.BatchReply.labels)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >&
+BatchReply::_internal_labels() const {
+  return labels_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >&
+BatchReply::labels() const {
+  // @@protoc_insertion_point(field_list:comm.BatchReply.labels)
+  return _internal_labels();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >*
+BatchReply::_internal_mutable_labels() {
+  return &labels_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int64 >*
+BatchReply::mutable_labels() {
+  // @@protoc_insertion_point(field_mutable_list:comm.BatchReply.labels)
+  return _internal_mutable_labels();
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 

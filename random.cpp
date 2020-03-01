@@ -12,8 +12,8 @@ using std::vector;
 
 Random::Random() {
     std::random_device rd;
-    // engine.seed(123);
-    engine.seed(rd());
+    engine.seed(123);
+    // engine.seed(rd());
 }
 
 

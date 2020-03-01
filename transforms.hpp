@@ -19,6 +19,7 @@ Mat RandomHorizontalFlip(Mat &im, double p=0.5, bool inplace=true);
 Mat RandomResizedCrop(Mat &im, array<int, 2> size,
         array<double, 2> scale={0.08, 1.},
         array<double, 2> ratio={3./4., 4./3.});
+Mat Normalize(Mat &im, array<double, 3> mean, array<double, 3> std);
 Mat HWC2CHW (Mat &im);
 Mat TransTrain(Mat& im, array<int, 2> size,  bool inplace=true);
 

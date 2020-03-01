@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='comm',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x0finterface.proto\x12\x04\x63omm\"\x19\n\nIdxRequest\x12\x0b\n\x03num\x18\x01 \x01(\x05\"E\n\x08ImgReply\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05shape\x18\x02 \x03(\x05\x12\r\n\x05label\x18\x03 \x01(\x05\x12\r\n\x05\x64type\x18\x04 \x01(\t2D\n\x0cImageService\x12\x34\n\x0eget_img_by_idx\x12\x10.comm.IdxRequest\x1a\x0e.comm.ImgReply\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x0finterface.proto\x12\x04\x63omm\"\x19\n\nIdxRequest\x12\x0b\n\x03num\x18\x01 \x01(\x05\"E\n\x08ImgReply\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05shape\x18\x02 \x03(\x05\x12\r\n\x05\x64type\x18\x03 \x01(\t\x12\r\n\x05label\x18\x04 \x01(\x03\"!\n\x0c\x42\x61tchRequest\x12\x11\n\tbatchsize\x18\x01 \x01(\x05\"H\n\nBatchReply\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05shape\x18\x02 \x03(\x05\x12\r\n\x05\x64type\x18\x03 \x01(\t\x12\x0e\n\x06labels\x18\x04 \x03(\x03\x32y\n\x0cImageService\x12\x34\n\x0eget_img_by_idx\x12\x10.comm.IdxRequest\x1a\x0e.comm.ImgReply\"\x00\x12\x33\n\tget_batch\x12\x12.comm.BatchRequest\x1a\x10.comm.BatchReply\"\x00\x62\x06proto3'
 )
 
 
@@ -77,16 +77,16 @@ _IMGREPLY = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='label', full_name='comm.ImgReply.label', index=2,
-      number=3, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
+      name='dtype', full_name='comm.ImgReply.dtype', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='dtype', full_name='comm.ImgReply.dtype', index=3,
-      number=4, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=b"".decode('utf-8'),
+      name='label', full_name='comm.ImgReply.label', index=3,
+      number=4, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -106,8 +106,93 @@ _IMGREPLY = _descriptor.Descriptor(
   serialized_end=121,
 )
 
+
+_BATCHREQUEST = _descriptor.Descriptor(
+  name='BatchRequest',
+  full_name='comm.BatchRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='batchsize', full_name='comm.BatchRequest.batchsize', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=123,
+  serialized_end=156,
+)
+
+
+_BATCHREPLY = _descriptor.Descriptor(
+  name='BatchReply',
+  full_name='comm.BatchReply',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='data', full_name='comm.BatchReply.data', index=0,
+      number=1, type=12, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"",
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='shape', full_name='comm.BatchReply.shape', index=1,
+      number=2, type=5, cpp_type=1, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='dtype', full_name='comm.BatchReply.dtype', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=b"".decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='labels', full_name='comm.BatchReply.labels', index=3,
+      number=4, type=3, cpp_type=2, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=158,
+  serialized_end=230,
+)
+
 DESCRIPTOR.message_types_by_name['IdxRequest'] = _IDXREQUEST
 DESCRIPTOR.message_types_by_name['ImgReply'] = _IMGREPLY
+DESCRIPTOR.message_types_by_name['BatchRequest'] = _BATCHREQUEST
+DESCRIPTOR.message_types_by_name['BatchReply'] = _BATCHREPLY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 IdxRequest = _reflection.GeneratedProtocolMessageType('IdxRequest', (_message.Message,), {
@@ -124,6 +209,20 @@ ImgReply = _reflection.GeneratedProtocolMessageType('ImgReply', (_message.Messag
   })
 _sym_db.RegisterMessage(ImgReply)
 
+BatchRequest = _reflection.GeneratedProtocolMessageType('BatchRequest', (_message.Message,), {
+  'DESCRIPTOR' : _BATCHREQUEST,
+  '__module__' : 'interface_pb2'
+  # @@protoc_insertion_point(class_scope:comm.BatchRequest)
+  })
+_sym_db.RegisterMessage(BatchRequest)
+
+BatchReply = _reflection.GeneratedProtocolMessageType('BatchReply', (_message.Message,), {
+  'DESCRIPTOR' : _BATCHREPLY,
+  '__module__' : 'interface_pb2'
+  # @@protoc_insertion_point(class_scope:comm.BatchReply)
+  })
+_sym_db.RegisterMessage(BatchReply)
+
 
 
 _IMAGESERVICE = _descriptor.ServiceDescriptor(
@@ -132,8 +231,8 @@ _IMAGESERVICE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=123,
-  serialized_end=191,
+  serialized_start=232,
+  serialized_end=353,
   methods=[
   _descriptor.MethodDescriptor(
     name='get_img_by_idx',
@@ -142,6 +241,15 @@ _IMAGESERVICE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_IDXREQUEST,
     output_type=_IMGREPLY,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='get_batch',
+    full_name='comm.ImageService.get_batch',
+    index=1,
+    containing_service=None,
+    input_type=_BATCHREQUEST,
+    output_type=_BATCHREPLY,
     serialized_options=None,
   ),
 ])

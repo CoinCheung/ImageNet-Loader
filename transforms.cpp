@@ -103,9 +103,21 @@ Mat RandomResizedCrop(Mat &im, array<int, 2> size, array<double, 2> scale, array
 }
 
 
+Mat Normalize(Mat &im, array<double, 3> mean, array<double, 3> std) {
+    Mat res;
+    im.convertTo(res, CV_32FC3, 1. / 255);
+    cv::subtract(res, cv::Scalar(mean[0], mean[1], mean[2]), res);
+    cv::divide(res, cv::Scalar(std[0], std[1], std[2]), res);
+
+    return res;
+}
+
+
 Mat TransTrain(Mat& im, array<int, 2> size,  bool inplace) {
     Mat res = RandomResizedCrop(im, size);
     res = RandomHorizontalFlip(res, inplace);
+    array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225}; 
+    res = Normalize(res, mean, std);
     return res;
 }
 

@@ -22,12 +22,19 @@ using grpc::ServerContext;
 class ImageServiceImpl final: public comm::ImageService::Service {
     public:
         vector<string> imgpths;
-        vector<int> labels;
+        vector<int64_t> labels;
+        vector<int> indices;
+        int curr_pos;
+        int n_train;
+        array<int, 2> size;
 
         ImageServiceImpl();
         Status get_img_by_idx(ServerContext *context,
                 const comm::IdxRequest *request, 
                 comm::ImgReply* reply);
+        Status get_batch(ServerContext *context,
+                const comm::BatchRequest *request, 
+                comm::BatchReply* reply);
 
         void read_annos();
 };

@@ -5,16 +5,28 @@ package comm;
 
 service ImageService {
     rpc get_img_by_idx (IdxRequest) returns (ImgReply) {}
+    rpc get_batch (BatchRequest) returns (BatchReply) {}
 }
+
 
 message IdxRequest {
     int32 num = 1;
 }
 
-
 message ImgReply {
     bytes data = 1;
     repeated int32 shape = 2;
-    int32 label = 3;
-    string dtype = 4;
+    string dtype = 3;
+    int64 label = 4;
+}
+
+message BatchRequest {
+    int32 batchsize = 1;
+}
+
+message BatchReply {
+    bytes data = 1;
+    repeated int32 shape = 2;
+    string dtype = 3;
+    repeated int64 labels = 4;
 }
