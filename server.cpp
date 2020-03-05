@@ -6,6 +6,8 @@
 #include <vector>
 #include <array>
 #include <cstring>
+#include <thread>
+#include <future>
 
 #include <opencv2/opencv.hpp>
 #include <grpcpp/grpcpp.h>
@@ -32,17 +34,18 @@ using grpc::ServerBuilder;
 using grpc::ServerContext;
 
 // TODO: 
-// 1. multi-thread 
+// done 1. multi-thread 
 // 2. prefetch
 // 3. do not use batchsize field, make train/val batch size global field
+// 4. 
 
 
 ImageServiceImpl::ImageServiceImpl() {
     read_annos();
     curr_pos = 0;
     size = {224, 224};
-    n_workers = 16;
-    batch_size = 256;
+    n_workers = 64;
+    batch_size = 1024;
 }
 
 
@@ -149,27 +152,46 @@ Status ImageServiceImpl::get_batch(ServerContext *context,
 
     int64_t chunksize = size[0] * size[1] * 3 * sizeof(float);
     int64_t bufsize = chunksize * bs;
-    vector<uint8_t> buf(bufsize, 1);
+    vector<uint8_t> imbuf(bufsize, 1);
+    vector<int64_t> lbbuf(bs);
 
-    for (int i{0}; i < bs; ++i) {
-        int idx = indices[curr_pos];
-        string impth = imgpths[idx];
-        reply->add_labels(labels[idx]);
+    auto thread_func = [&](int thread_idx) {
+        int bs_thread = (bs / n_workers) + 1;
+        for (int i{0}; i < bs_thread; ++i) {
+            int bs_idx = thread_idx + i * n_workers;
+            int im_idx = curr_pos + bs_idx;
+            if (im_idx >= n_train || bs_idx >= bs) continue;
 
-        Mat im = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
-        im = TransTrain(im, size);
+            string impth = imgpths[im_idx];
+            lbbuf[bs_idx] = labels[im_idx];
 
-        if (im.isContinuous()) im = im.clone();
-        std::memcpy(&buf[i * chunksize], im.data, chunksize);
-        ++curr_pos;
-        if (curr_pos > n_train) {curr_pos = curr_pos % n_train;}
+            Mat im = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
+            im = TransTrain(im, size);
+            if (im.isContinuous()) im = im.clone();
+            std::memcpy(&imbuf[bs_idx * chunksize], im.data, chunksize);
+        }
+    };
+
+    vector<std::future<void>> tpool(n_workers);
+    for (int i{0}; i < n_workers; ++i) {
+        tpool[i] = std::async(std::launch::async, thread_func, i);
+    }
+    for (int i{0}; i < n_workers; ++i) {
+        tpool[i].get();
+    }
+    cout << "done batch process\n";
+    curr_pos += bs;
+    if (curr_pos > n_train) {
+        cout << "one epoch done, start from beginning without shuffling\n"; 
+        curr_pos = curr_pos % n_train;
     }
 
+    for (int64_t &lb : lbbuf) reply->add_labels(lb);
     reply->add_shape(bs);
     reply->add_shape(size[0]);
     reply->add_shape(size[1]);
     reply->add_shape(3);
-    reply->set_data(buf.data(), bufsize);
+    reply->set_data(imbuf.data(), bufsize);
     reply->set_dtype("float32");
 
     return Status::OK;

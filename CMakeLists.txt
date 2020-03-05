@@ -22,7 +22,7 @@ list(APPEND LIGHTSTEP_LINK_LIBRARY ${OpenCV_LIBS})
 
 
 ## other link libs
-list(APPEND LIGHTSTEP_LINK_LIBRARY glog)
+list(APPEND LIGHTSTEP_LINK_LIBRARY glog pthread)
 
 ## subdirs
 add_subdirectory (comm)

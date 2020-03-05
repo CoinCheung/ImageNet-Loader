@@ -30,8 +30,8 @@ def run_get_by_idx():
     with grpc.insecure_channel(
             'localhost:50001',
             options=[
-                ('grpc.max_receive_message_length', 1 << 28),
-                ('grpc.max_send_message_length', 1 << 28),
+                ('grpc.max_receive_message_length', 1 << 31),
+                ('grpc.max_send_message_length', 1 << 31),
             ]
         ) as channel:
         stub = ImageServiceStub(channel)
@@ -49,8 +49,8 @@ def run_get_batch():
     with grpc.insecure_channel(
             'localhost:50001',
             options=[
-                ('grpc.max_receive_message_length', 1 << 28),
-                ('grpc.max_send_message_length', 1 << 28),
+                ('grpc.max_receive_message_length', 1 << 30),
+                ('grpc.max_send_message_length', 1 << 30),
             ]
         ) as channel:
         stub = ImageServiceStub(channel)
@@ -65,16 +65,17 @@ def run_get_batch():
                 reply.data, dtype=reply.dtype).reshape(reply.shape)
         lbs = np.array(reply.labels)
         print(ims.shape)
-        print(ims[:4, :4, :4, 0].ravel())
-        print(lbs[:4])
+        #  print(ims[:4, :4, :4, 0].ravel())
+        #  print(lbs[:4])
 
-        print(np.sum(ims))
+        #  print(np.sum(ims))
 
-    for i, im in enumerate(ims):
-        cv2.imwrite('../tmp/save_{}.jpg'.format(i), im)
+    #  for i, im in enumerate(ims):
+    #      cv2.imwrite('../tmp/save_{}.jpg'.format(i), im)
 
 
 if __name__ == "__main__":
     logging.basicConfig()
     #  run_get_by_idx()
-    run_get_batch()
+    for _ in range(1400):
+        run_get_batch()

@@ -48,8 +48,8 @@ void start_server() {
     ServerBuilder builder;
     builder.AddListeningPort(addr, grpc::InsecureServerCredentials());
     builder.RegisterService(&service);
-    builder.SetMaxSendMessageSize(1 << 28);
-    builder.SetMaxReceiveMessageSize(1 << 28);
+    builder.SetMaxSendMessageSize(1L << 31);
+    builder.SetMaxReceiveMessageSize(1L << 31);
 
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
     std::cout << "service started, listening to: " << addr << std::endl;
