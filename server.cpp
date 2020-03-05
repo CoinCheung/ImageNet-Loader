@@ -31,12 +31,18 @@ using grpc::Status;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 
+// TODO: 
+// 1. multi-thread 
+// 2. prefetch
+// 3. do not use batchsize field, make train/val batch size global field
 
 
 ImageServiceImpl::ImageServiceImpl() {
     read_annos();
     curr_pos = 0;
     size = {224, 224};
+    n_workers = 16;
+    batch_size = 256;
 }
 
 
@@ -74,14 +80,11 @@ Status ImageServiceImpl::get_img_by_idx(ServerContext *context,
         comm::ImgReply* reply) {
 
     int idx = request->num();
-    // cout << "request idx is: " << idx << endl;
     string impth = imgpths[idx];
 
-    // cout << impth << endl;
     Mat im = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
     im = TransTrain(im, size);
     if (!im.isContinuous()) im = im.clone();
-    // cout << im.size << endl;
 
     array<int, 3> shape{im.rows, im.cols, im.channels()};
     int bytes_len = im.elemSize1();
@@ -89,15 +92,51 @@ Status ImageServiceImpl::get_img_by_idx(ServerContext *context,
         bytes_len *= el;
         reply->add_shape(el);
     }
-    // cout << "bytes_len: " << bytes_len << endl;
     reply->set_data(im.data, bytes_len);
     reply->set_dtype("float32");
     reply->set_label(labels[idx]);
 
-    // cout << im(cv::Rect(0, 0, 4, 4)) << endl;
-
     return Status::OK;
 }
+
+/* 
+ * // single thread version
+ * Status ImageServiceImpl::get_batch(ServerContext *context,
+ *         const comm::BatchRequest *request,
+ *         comm::BatchReply* reply) {
+ *
+ *     cout <<"get bach called\n";
+ *     int bs = batch_size;
+ *     cout << "batch size: " << bs << endl;
+ *
+ *     int64_t chunksize = size[0] * size[1] * 3 * sizeof(float);
+ *     int64_t bufsize = chunksize * bs;
+ *     vector<uint8_t> buf(bufsize, 1);
+ *
+ *     for (int i{0}; i < bs; ++i) {
+ *         int idx = indices[curr_pos];
+ *         string impth = imgpths[idx];
+ *         reply->add_labels(labels[idx]);
+ *
+ *         Mat im = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
+ *         im = TransTrain(im, size);
+ *
+ *         if (im.isContinuous()) im = im.clone();
+ *         std::memcpy(&buf[i * chunksize], im.data, chunksize);
+ *         ++curr_pos;
+ *         if (curr_pos > n_train) {curr_pos = curr_pos % n_train;}
+ *     }
+ *
+ *     reply->add_shape(bs);
+ *     reply->add_shape(size[0]);
+ *     reply->add_shape(size[1]);
+ *     reply->add_shape(3);
+ *     reply->set_data(buf.data(), bufsize);
+ *     reply->set_dtype("float32");
+ *
+ *     return Status::OK;
+ * }
+ *  */
 
 
 Status ImageServiceImpl::get_batch(ServerContext *context,
@@ -105,33 +144,32 @@ Status ImageServiceImpl::get_batch(ServerContext *context,
         comm::BatchReply* reply) {
 
     cout <<"get bach called\n";
-    int bs = request->batchsize();
+    int bs = batch_size;
+    cout << "batch size: " << bs << endl;
 
-    int64_t chunksize = size[0] * size[1] * 3 * 4;
+    int64_t chunksize = size[0] * size[1] * 3 * sizeof(float);
     int64_t bufsize = chunksize * bs;
-    vector<uint8_t> buf(bufsize);
+    vector<uint8_t> buf(bufsize, 1);
 
     for (int i{0}; i < bs; ++i) {
         int idx = indices[curr_pos];
         string impth = imgpths[idx];
         reply->add_labels(labels[idx]);
 
-        // TODO: find a method to check this
         Mat im = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
         im = TransTrain(im, size);
-        if (!im.isContinuous()) im = im.clone();
-        std::memcpy(im.data, &buf[0] + chunksize, chunksize);
+
+        if (im.isContinuous()) im = im.clone();
+        std::memcpy(&buf[i * chunksize], im.data, chunksize);
         ++curr_pos;
         if (curr_pos > n_train) {curr_pos = curr_pos % n_train;}
-        cout << idx << ", ";
     }
-    cout << endl;
 
     reply->add_shape(bs);
     reply->add_shape(size[0]);
     reply->add_shape(size[1]);
     reply->add_shape(3);
-    reply->set_data(&buf[0], bufsize);
+    reply->set_data(buf.data(), bufsize);
     reply->set_dtype("float32");
 
     return Status::OK;

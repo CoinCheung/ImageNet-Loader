@@ -21,7 +21,7 @@ message ImgReply {
 }
 
 message BatchRequest {
-    int32 batchsize = 1;
+    // int32 batchsize = 1;
 }
 
 message BatchReply {

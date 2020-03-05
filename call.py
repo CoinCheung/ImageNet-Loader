@@ -55,9 +55,11 @@ def run_get_batch():
         ) as channel:
         stub = ImageServiceStub(channel)
 
-        req = BatchRequest(batchsize=256)
-        print('after call')
+        #  req = BatchRequest(batchsize=256)
+        req = BatchRequest()
+        print('before call')
         reply = stub.get_batch(req)
+        print('after call')
 
         ims = np.frombuffer(
                 reply.data, dtype=reply.dtype).reshape(reply.shape)
@@ -65,6 +67,11 @@ def run_get_batch():
         print(ims.shape)
         print(ims[:4, :4, :4, 0].ravel())
         print(lbs[:4])
+
+        print(np.sum(ims))
+
+    for i, im in enumerate(ims):
+        cv2.imwrite('../tmp/save_{}.jpg'.format(i), im)
 
 
 if __name__ == "__main__":

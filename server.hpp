@@ -24,9 +24,11 @@ class ImageServiceImpl final: public comm::ImageService::Service {
         vector<string> imgpths;
         vector<int64_t> labels;
         vector<int> indices;
+        array<int, 2> size;
         int curr_pos;
         int n_train;
-        array<int, 2> size;
+        int n_workers;
+        int batch_size;
 
         ImageServiceImpl();
         Status get_img_by_idx(ServerContext *context,

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iterator>
 #include <cmath>
+#include <sstream>
 #include <opencv2/opencv.hpp>
 #include <glog/logging.h>
 
@@ -13,10 +14,13 @@
 
 using std::cout;
 using std::endl;
+using std::stringstream;
 using std::array;
 using cv::Mat;
 
 
+// useless var
+int tmp_i = 0;
 // NOTE: it is very import to use same data types as in python. integers should all
 // be int64_t and float should be double by default.
 //
@@ -116,7 +120,7 @@ Mat Normalize(Mat &im, array<double, 3> mean, array<double, 3> std) {
 Mat TransTrain(Mat& im, array<int, 2> size,  bool inplace) {
     Mat res = RandomResizedCrop(im, size);
     res = RandomHorizontalFlip(res, inplace);
-    array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225}; 
+    array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
     res = Normalize(res, mean, std);
     return res;
 }
