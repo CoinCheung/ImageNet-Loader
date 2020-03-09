@@ -500,24 +500,11 @@ class BatchRequest :
 
   // accessors -------------------------------------------------------
 
-  enum : int {
-    kBatchsizeFieldNumber = 1,
-  };
-  // int32 batchsize = 1;
-  void clear_batchsize();
-  ::PROTOBUF_NAMESPACE_ID::int32 batchsize() const;
-  void set_batchsize(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_batchsize() const;
-  void _internal_set_batchsize(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
   // @@protoc_insertion_point(class_scope:comm.BatchRequest)
  private:
   class _Internal;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArena _internal_metadata_;
-  ::PROTOBUF_NAMESPACE_ID::int32 batchsize_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_interface_2eproto;
 };
@@ -949,26 +936,6 @@ inline void ImgReply::set_label(::PROTOBUF_NAMESPACE_ID::int64 value) {
 // -------------------------------------------------------------------
 
 // BatchRequest
-
-// int32 batchsize = 1;
-inline void BatchRequest::clear_batchsize() {
-  batchsize_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 BatchRequest::_internal_batchsize() const {
-  return batchsize_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 BatchRequest::batchsize() const {
-  // @@protoc_insertion_point(field_get:comm.BatchRequest.batchsize)
-  return _internal_batchsize();
-}
-inline void BatchRequest::_internal_set_batchsize(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  batchsize_ = value;
-}
-inline void BatchRequest::set_batchsize(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_batchsize(value);
-  // @@protoc_insertion_point(field_set:comm.BatchRequest.batchsize)
-}
 
 // -------------------------------------------------------------------
 

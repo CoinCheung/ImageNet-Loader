@@ -50,6 +50,15 @@ class ImageService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::comm::BatchReply>> PrepareAsyncget_batch(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::comm::BatchReply>>(PrepareAsyncget_batchRaw(context, request, cq));
     }
+    std::unique_ptr< ::grpc::ClientReaderInterface< ::comm::ImgReply>> get_batch_stream(::grpc::ClientContext* context, const ::comm::BatchRequest& request) {
+      return std::unique_ptr< ::grpc::ClientReaderInterface< ::comm::ImgReply>>(get_batch_streamRaw(context, request));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::comm::ImgReply>> Asyncget_batch_stream(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::comm::ImgReply>>(Asyncget_batch_streamRaw(context, request, cq, tag));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::comm::ImgReply>> PrepareAsyncget_batch_stream(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::comm::ImgReply>>(PrepareAsyncget_batch_streamRaw(context, request, cq));
+    }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
@@ -77,6 +86,11 @@ class ImageService final {
       #else
       virtual void get_batch(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::comm::BatchReply* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       #endif
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      virtual void get_batch_stream(::grpc::ClientContext* context, ::comm::BatchRequest* request, ::grpc::ClientReadReactor< ::comm::ImgReply>* reactor) = 0;
+      #else
+      virtual void get_batch_stream(::grpc::ClientContext* context, ::comm::BatchRequest* request, ::grpc::experimental::ClientReadReactor< ::comm::ImgReply>* reactor) = 0;
+      #endif
     };
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     typedef class experimental_async_interface async_interface;
@@ -90,6 +104,9 @@ class ImageService final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::comm::ImgReply>* PrepareAsyncget_img_by_idxRaw(::grpc::ClientContext* context, const ::comm::IdxRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::comm::BatchReply>* Asyncget_batchRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::comm::BatchReply>* PrepareAsyncget_batchRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientReaderInterface< ::comm::ImgReply>* get_batch_streamRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request) = 0;
+    virtual ::grpc::ClientAsyncReaderInterface< ::comm::ImgReply>* Asyncget_batch_streamRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq, void* tag) = 0;
+    virtual ::grpc::ClientAsyncReaderInterface< ::comm::ImgReply>* PrepareAsyncget_batch_streamRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -107,6 +124,15 @@ class ImageService final {
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::comm::BatchReply>> PrepareAsyncget_batch(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::comm::BatchReply>>(PrepareAsyncget_batchRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientReader< ::comm::ImgReply>> get_batch_stream(::grpc::ClientContext* context, const ::comm::BatchRequest& request) {
+      return std::unique_ptr< ::grpc::ClientReader< ::comm::ImgReply>>(get_batch_streamRaw(context, request));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReader< ::comm::ImgReply>> Asyncget_batch_stream(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReader< ::comm::ImgReply>>(Asyncget_batch_streamRaw(context, request, cq, tag));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReader< ::comm::ImgReply>> PrepareAsyncget_batch_stream(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReader< ::comm::ImgReply>>(PrepareAsyncget_batch_streamRaw(context, request, cq));
     }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
@@ -135,6 +161,11 @@ class ImageService final {
       #else
       void get_batch(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::comm::BatchReply* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       #endif
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      void get_batch_stream(::grpc::ClientContext* context, ::comm::BatchRequest* request, ::grpc::ClientReadReactor< ::comm::ImgReply>* reactor) override;
+      #else
+      void get_batch_stream(::grpc::ClientContext* context, ::comm::BatchRequest* request, ::grpc::experimental::ClientReadReactor< ::comm::ImgReply>* reactor) override;
+      #endif
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -150,8 +181,12 @@ class ImageService final {
     ::grpc::ClientAsyncResponseReader< ::comm::ImgReply>* PrepareAsyncget_img_by_idxRaw(::grpc::ClientContext* context, const ::comm::IdxRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::comm::BatchReply>* Asyncget_batchRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::comm::BatchReply>* PrepareAsyncget_batchRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientReader< ::comm::ImgReply>* get_batch_streamRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request) override;
+    ::grpc::ClientAsyncReader< ::comm::ImgReply>* Asyncget_batch_streamRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq, void* tag) override;
+    ::grpc::ClientAsyncReader< ::comm::ImgReply>* PrepareAsyncget_batch_streamRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_get_img_by_idx_;
     const ::grpc::internal::RpcMethod rpcmethod_get_batch_;
+    const ::grpc::internal::RpcMethod rpcmethod_get_batch_stream_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -161,6 +196,7 @@ class ImageService final {
     virtual ~Service();
     virtual ::grpc::Status get_img_by_idx(::grpc::ServerContext* context, const ::comm::IdxRequest* request, ::comm::ImgReply* response);
     virtual ::grpc::Status get_batch(::grpc::ServerContext* context, const ::comm::BatchRequest* request, ::comm::BatchReply* response);
+    virtual ::grpc::Status get_batch_stream(::grpc::ServerContext* context, const ::comm::BatchRequest* request, ::grpc::ServerWriter< ::comm::ImgReply>* writer);
   };
   template <class BaseClass>
   class WithAsyncMethod_get_img_by_idx : public BaseClass {
@@ -202,7 +238,27 @@ class ImageService final {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_get_img_by_idx<WithAsyncMethod_get_batch<Service > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_get_batch_stream : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_get_batch_stream() {
+      ::grpc::Service::MarkMethodAsync(2);
+    }
+    ~WithAsyncMethod_get_batch_stream() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status get_batch_stream(::grpc::ServerContext* /*context*/, const ::comm::BatchRequest* /*request*/, ::grpc::ServerWriter< ::comm::ImgReply>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestget_batch_stream(::grpc::ServerContext* context, ::comm::BatchRequest* request, ::grpc::ServerAsyncWriter< ::comm::ImgReply>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncServerStreaming(2, context, request, writer, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_get_img_by_idx<WithAsyncMethod_get_batch<WithAsyncMethod_get_batch_stream<Service > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_get_img_by_idx : public BaseClass {
    private:
@@ -297,11 +353,49 @@ class ImageService final {
     #endif
       { return nullptr; }
   };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_get_batch_stream : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    ExperimentalWithCallbackMethod_get_batch_stream() {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::Service::
+    #else
+      ::grpc::Service::experimental().
+    #endif
+        MarkMethodCallback(2,
+          new ::grpc_impl::internal::CallbackServerStreamingHandler< ::comm::BatchRequest, ::comm::ImgReply>(
+            [this](
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+                   ::grpc::CallbackServerContext*
+    #else
+                   ::grpc::experimental::CallbackServerContext*
+    #endif
+                     context, const ::comm::BatchRequest* request) { return this->get_batch_stream(context, request); }));
+    }
+    ~ExperimentalWithCallbackMethod_get_batch_stream() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status get_batch_stream(::grpc::ServerContext* /*context*/, const ::comm::BatchRequest* /*request*/, ::grpc::ServerWriter< ::comm::ImgReply>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+    virtual ::grpc::ServerWriteReactor< ::comm::ImgReply>* get_batch_stream(
+      ::grpc::CallbackServerContext* /*context*/, const ::comm::BatchRequest* /*request*/)
+    #else
+    virtual ::grpc::experimental::ServerWriteReactor< ::comm::ImgReply>* get_batch_stream(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::comm::BatchRequest* /*request*/)
+    #endif
+      { return nullptr; }
+  };
   #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-  typedef ExperimentalWithCallbackMethod_get_img_by_idx<ExperimentalWithCallbackMethod_get_batch<Service > > CallbackService;
+  typedef ExperimentalWithCallbackMethod_get_img_by_idx<ExperimentalWithCallbackMethod_get_batch<ExperimentalWithCallbackMethod_get_batch_stream<Service > > > CallbackService;
   #endif
 
-  typedef ExperimentalWithCallbackMethod_get_img_by_idx<ExperimentalWithCallbackMethod_get_batch<Service > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_get_img_by_idx<ExperimentalWithCallbackMethod_get_batch<ExperimentalWithCallbackMethod_get_batch_stream<Service > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_get_img_by_idx : public BaseClass {
    private:
@@ -332,6 +426,23 @@ class ImageService final {
     }
     // disable synchronous version of this method
     ::grpc::Status get_batch(::grpc::ServerContext* /*context*/, const ::comm::BatchRequest* /*request*/, ::comm::BatchReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_get_batch_stream : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_get_batch_stream() {
+      ::grpc::Service::MarkMethodGeneric(2);
+    }
+    ~WithGenericMethod_get_batch_stream() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status get_batch_stream(::grpc::ServerContext* /*context*/, const ::comm::BatchRequest* /*request*/, ::grpc::ServerWriter< ::comm::ImgReply>* /*writer*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -374,6 +485,26 @@ class ImageService final {
     }
     void Requestget_batch(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_get_batch_stream : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_get_batch_stream() {
+      ::grpc::Service::MarkMethodRaw(2);
+    }
+    ~WithRawMethod_get_batch_stream() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status get_batch_stream(::grpc::ServerContext* /*context*/, const ::comm::BatchRequest* /*request*/, ::grpc::ServerWriter< ::comm::ImgReply>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestget_batch_stream(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncWriter< ::grpc::ByteBuffer>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncServerStreaming(2, context, request, writer, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -453,6 +584,44 @@ class ImageService final {
       { return nullptr; }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_get_batch_stream : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    ExperimentalWithRawCallbackMethod_get_batch_stream() {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::Service::
+    #else
+      ::grpc::Service::experimental().
+    #endif
+        MarkMethodRawCallback(2,
+          new ::grpc_impl::internal::CallbackServerStreamingHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+                   ::grpc::CallbackServerContext*
+    #else
+                   ::grpc::experimental::CallbackServerContext*
+    #endif
+                     context, const::grpc::ByteBuffer* request) { return this->get_batch_stream(context, request); }));
+    }
+    ~ExperimentalWithRawCallbackMethod_get_batch_stream() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status get_batch_stream(::grpc::ServerContext* /*context*/, const ::comm::BatchRequest* /*request*/, ::grpc::ServerWriter< ::comm::ImgReply>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+    virtual ::grpc::ServerWriteReactor< ::grpc::ByteBuffer>* get_batch_stream(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
+    #else
+    virtual ::grpc::experimental::ServerWriteReactor< ::grpc::ByteBuffer>* get_batch_stream(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
+    #endif
+      { return nullptr; }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_get_img_by_idx : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -493,8 +662,28 @@ class ImageService final {
     virtual ::grpc::Status Streamedget_batch(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::comm::BatchRequest,::comm::BatchReply>* server_unary_streamer) = 0;
   };
   typedef WithStreamedUnaryMethod_get_img_by_idx<WithStreamedUnaryMethod_get_batch<Service > > StreamedUnaryService;
-  typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_get_img_by_idx<WithStreamedUnaryMethod_get_batch<Service > > StreamedService;
+  template <class BaseClass>
+  class WithSplitStreamingMethod_get_batch_stream : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithSplitStreamingMethod_get_batch_stream() {
+      ::grpc::Service::MarkMethodStreamed(2,
+        new ::grpc::internal::SplitServerStreamingHandler< ::comm::BatchRequest, ::comm::ImgReply>(std::bind(&WithSplitStreamingMethod_get_batch_stream<BaseClass>::Streamedget_batch_stream, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithSplitStreamingMethod_get_batch_stream() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status get_batch_stream(::grpc::ServerContext* /*context*/, const ::comm::BatchRequest* /*request*/, ::grpc::ServerWriter< ::comm::ImgReply>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with split streamed
+    virtual ::grpc::Status Streamedget_batch_stream(::grpc::ServerContext* context, ::grpc::ServerSplitStreamer< ::comm::BatchRequest,::comm::ImgReply>* server_split_streamer) = 0;
+  };
+  typedef WithSplitStreamingMethod_get_batch_stream<Service > SplitStreamedService;
+  typedef WithStreamedUnaryMethod_get_img_by_idx<WithStreamedUnaryMethod_get_batch<WithSplitStreamingMethod_get_batch_stream<Service > > > StreamedService;
 };
 
 }  // namespace comm

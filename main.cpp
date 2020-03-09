@@ -50,11 +50,17 @@ void start_server() {
     builder.RegisterService(&service);
     builder.SetMaxSendMessageSize(1L << 31);
     builder.SetMaxReceiveMessageSize(1L << 31);
+    grpc::ResourceQuota rq;
+    rq.SetMaxThreads(1280);
+    builder.SetResourceQuota(rq);
 
     std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
     std::cout << "service started, listening to: " << addr << std::endl;
 
     server->Wait();
+
+    std::cout << "after wait() is called\n";
+
 }
 
 

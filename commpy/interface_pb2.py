@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='comm',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x0finterface.proto\x12\x04\x63omm\"\x19\n\nIdxRequest\x12\x0b\n\x03num\x18\x01 \x01(\x05\"E\n\x08ImgReply\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05shape\x18\x02 \x03(\x05\x12\r\n\x05\x64type\x18\x03 \x01(\t\x12\r\n\x05label\x18\x04 \x01(\x03\"!\n\x0c\x42\x61tchRequest\x12\x11\n\tbatchsize\x18\x01 \x01(\x05\"H\n\nBatchReply\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05shape\x18\x02 \x03(\x05\x12\r\n\x05\x64type\x18\x03 \x01(\t\x12\x0e\n\x06labels\x18\x04 \x03(\x03\x32y\n\x0cImageService\x12\x34\n\x0eget_img_by_idx\x12\x10.comm.IdxRequest\x1a\x0e.comm.ImgReply\"\x00\x12\x33\n\tget_batch\x12\x12.comm.BatchRequest\x1a\x10.comm.BatchReply\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x0finterface.proto\x12\x04\x63omm\"\x19\n\nIdxRequest\x12\x0b\n\x03num\x18\x01 \x01(\x05\"E\n\x08ImgReply\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05shape\x18\x02 \x03(\x05\x12\r\n\x05\x64type\x18\x03 \x01(\t\x12\r\n\x05label\x18\x04 \x01(\x03\"\x0e\n\x0c\x42\x61tchRequest\"H\n\nBatchReply\x12\x0c\n\x04\x64\x61ta\x18\x01 \x01(\x0c\x12\r\n\x05shape\x18\x02 \x03(\x05\x12\r\n\x05\x64type\x18\x03 \x01(\t\x12\x0e\n\x06labels\x18\x04 \x03(\x03\x32\xb5\x01\n\x0cImageService\x12\x34\n\x0eget_img_by_idx\x12\x10.comm.IdxRequest\x1a\x0e.comm.ImgReply\"\x00\x12\x33\n\tget_batch\x12\x12.comm.BatchRequest\x1a\x10.comm.BatchReply\"\x00\x12:\n\x10get_batch_stream\x12\x12.comm.BatchRequest\x1a\x0e.comm.ImgReply\"\x00\x30\x01\x62\x06proto3'
 )
 
 
@@ -114,13 +114,6 @@ _BATCHREQUEST = _descriptor.Descriptor(
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
-    _descriptor.FieldDescriptor(
-      name='batchsize', full_name='comm.BatchRequest.batchsize', index=0,
-      number=1, type=5, cpp_type=1, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -134,7 +127,7 @@ _BATCHREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=123,
-  serialized_end=156,
+  serialized_end=137,
 )
 
 
@@ -185,8 +178,8 @@ _BATCHREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=158,
-  serialized_end=230,
+  serialized_start=139,
+  serialized_end=211,
 )
 
 DESCRIPTOR.message_types_by_name['IdxRequest'] = _IDXREQUEST
@@ -231,8 +224,8 @@ _IMAGESERVICE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=232,
-  serialized_end=353,
+  serialized_start=214,
+  serialized_end=395,
   methods=[
   _descriptor.MethodDescriptor(
     name='get_img_by_idx',
@@ -250,6 +243,15 @@ _IMAGESERVICE = _descriptor.ServiceDescriptor(
     containing_service=None,
     input_type=_BATCHREQUEST,
     output_type=_BATCHREPLY,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='get_batch_stream',
+    full_name='comm.ImageService.get_batch_stream',
+    index=2,
+    containing_service=None,
+    input_type=_BATCHREQUEST,
+    output_type=_IMGREPLY,
     serialized_options=None,
   ),
 ])

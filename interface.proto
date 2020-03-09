@@ -6,6 +6,7 @@ package comm;
 service ImageService {
     rpc get_img_by_idx (IdxRequest) returns (ImgReply) {}
     rpc get_batch (BatchRequest) returns (BatchReply) {}
+    rpc get_batch_stream (BatchRequest) returns (stream ImgReply) {}
 }
 
 

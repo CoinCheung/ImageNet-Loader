@@ -113,7 +113,6 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_interface_2eproto::offsets[] P
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::comm::BatchRequest, batchsize_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::comm::BatchReply, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -128,7 +127,7 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 0, -1, sizeof(::comm::IdxRequest)},
   { 6, -1, sizeof(::comm::ImgReply)},
   { 15, -1, sizeof(::comm::BatchRequest)},
-  { 21, -1, sizeof(::comm::BatchReply)},
+  { 20, -1, sizeof(::comm::BatchReply)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -142,13 +141,14 @@ const char descriptor_table_protodef_interface_2eproto[] PROTOBUF_SECTION_VARIAB
   "\n\017interface.proto\022\004comm\"\031\n\nIdxRequest\022\013\n"
   "\003num\030\001 \001(\005\"E\n\010ImgReply\022\014\n\004data\030\001 \001(\014\022\r\n\005"
   "shape\030\002 \003(\005\022\r\n\005dtype\030\003 \001(\t\022\r\n\005label\030\004 \001("
-  "\003\"!\n\014BatchRequest\022\021\n\tbatchsize\030\001 \001(\005\"H\n\n"
-  "BatchReply\022\014\n\004data\030\001 \001(\014\022\r\n\005shape\030\002 \003(\005\022"
-  "\r\n\005dtype\030\003 \001(\t\022\016\n\006labels\030\004 \003(\0032y\n\014ImageS"
-  "ervice\0224\n\016get_img_by_idx\022\020.comm.IdxReque"
-  "st\032\016.comm.ImgReply\"\000\0223\n\tget_batch\022\022.comm"
-  ".BatchRequest\032\020.comm.BatchReply\"\000b\006proto"
-  "3"
+  "\003\"\016\n\014BatchRequest\"H\n\nBatchReply\022\014\n\004data\030"
+  "\001 \001(\014\022\r\n\005shape\030\002 \003(\005\022\r\n\005dtype\030\003 \001(\t\022\016\n\006l"
+  "abels\030\004 \003(\0032\265\001\n\014ImageService\0224\n\016get_img_"
+  "by_idx\022\020.comm.IdxRequest\032\016.comm.ImgReply"
+  "\"\000\0223\n\tget_batch\022\022.comm.BatchRequest\032\020.co"
+  "mm.BatchReply\"\000\022:\n\020get_batch_stream\022\022.co"
+  "mm.BatchRequest\032\016.comm.ImgReply\"\0000\001b\006pro"
+  "to3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_interface_2eproto_deps[1] = {
 };
@@ -161,7 +161,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_int
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_interface_2eproto_once;
 static bool descriptor_table_interface_2eproto_initialized = false;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_interface_2eproto = {
-  &descriptor_table_interface_2eproto_initialized, descriptor_table_protodef_interface_2eproto, "interface.proto", 361,
+  &descriptor_table_interface_2eproto_initialized, descriptor_table_protodef_interface_2eproto, "interface.proto", 403,
   &descriptor_table_interface_2eproto_once, descriptor_table_interface_2eproto_sccs, descriptor_table_interface_2eproto_deps, 4, 0,
   schemas, file_default_instances, TableStruct_interface_2eproto::offsets,
   file_level_metadata_interface_2eproto, 4, file_level_enum_descriptors_interface_2eproto, file_level_service_descriptors_interface_2eproto,
@@ -672,12 +672,10 @@ BatchRequest::BatchRequest(const BatchRequest& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  batchsize_ = from.batchsize_;
   // @@protoc_insertion_point(copy_constructor:comm.BatchRequest)
 }
 
 void BatchRequest::SharedCtor() {
-  batchsize_ = 0;
 }
 
 BatchRequest::~BatchRequest() {
@@ -703,7 +701,6 @@ void BatchRequest::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  batchsize_ = 0;
   _internal_metadata_.Clear();
 }
 
@@ -713,16 +710,6 @@ const char* BatchRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_I
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
-    switch (tag >> 3) {
-      // int32 batchsize = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
-          batchsize_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else goto handle_unusual;
-        continue;
-      default: {
-      handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
           ctx->SetLastTag(tag);
           goto success;
@@ -730,8 +717,6 @@ const char* BatchRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_I
         ptr = UnknownFieldParse(tag, &_internal_metadata_, ptr, ctx);
         CHK_(ptr != nullptr);
         continue;
-      }
-    }  // switch
   }  // while
 success:
   return ptr;
@@ -746,12 +731,6 @@ failure:
   // @@protoc_insertion_point(serialize_to_array_start:comm.BatchRequest)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
-
-  // int32 batchsize = 1;
-  if (this->batchsize() != 0) {
-    target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_batchsize(), target);
-  }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
@@ -768,13 +747,6 @@ size_t BatchRequest::ByteSizeLong() const {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
-
-  // int32 batchsize = 1;
-  if (this->batchsize() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-        this->_internal_batchsize());
-  }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
@@ -807,9 +779,6 @@ void BatchRequest::MergeFrom(const BatchRequest& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.batchsize() != 0) {
-    _internal_set_batchsize(from._internal_batchsize());
-  }
 }
 
 void BatchRequest::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
@@ -833,7 +802,6 @@ bool BatchRequest::IsInitialized() const {
 void BatchRequest::InternalSwap(BatchRequest* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(batchsize_, other->batchsize_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata BatchRequest::GetMetadata() const {

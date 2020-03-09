@@ -1,6 +1,7 @@
 import os
 import os.path as osp
 import json
+import time
 
 from torch.utils.data import Dataset, DataLoader
 
@@ -73,7 +74,7 @@ class ImageNet(Dataset):
             T.ToTensor(),
             T.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
         ])
-
+    #
     #  def __getitem__(self, idx):
     #
     #      impth, label = self.samples[idx]
@@ -86,7 +87,6 @@ class ImageNet(Dataset):
     #      return im, label
 
     def __getitem__(self, idx):
-
         with grpc.insecure_channel(
                 'localhost:50001',
                 options=[
@@ -116,10 +116,13 @@ if __name__ == "__main__":
     dltrain = torch.utils.data.DataLoader(
         ds,
         shuffle=True,
-        batch_size=256,
-        num_workers=4,
+        batch_size=2048,
+        num_workers=32,
         pin_memory=True,
     )
+    t1 = time.time()
     for ims, lbs in dltrain:
+        t2 = time.time()
         print(ims.size())
-        print(lbs.size())
+        print('time is: {:.4f}'.format(t2 - t1))
+        t1 = time.time()

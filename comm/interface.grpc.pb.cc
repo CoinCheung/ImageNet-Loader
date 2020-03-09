@@ -24,6 +24,7 @@ namespace comm {
 static const char* ImageService_method_names[] = {
   "/comm.ImageService/get_img_by_idx",
   "/comm.ImageService/get_batch",
+  "/comm.ImageService/get_batch_stream",
 };
 
 std::unique_ptr< ImageService::Stub> ImageService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -35,6 +36,7 @@ std::unique_ptr< ImageService::Stub> ImageService::NewStub(const std::shared_ptr
 ImageService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   : channel_(channel), rpcmethod_get_img_by_idx_(ImageService_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_get_batch_(ImageService_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_get_batch_stream_(ImageService_method_names[2], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
   {}
 
 ::grpc::Status ImageService::Stub::get_img_by_idx(::grpc::ClientContext* context, const ::comm::IdxRequest& request, ::comm::ImgReply* response) {
@@ -93,6 +95,22 @@ void ImageService::Stub::experimental_async::get_batch(::grpc::ClientContext* co
   return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::comm::BatchReply>::Create(channel_.get(), cq, rpcmethod_get_batch_, context, request, false);
 }
 
+::grpc::ClientReader< ::comm::ImgReply>* ImageService::Stub::get_batch_streamRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request) {
+  return ::grpc_impl::internal::ClientReaderFactory< ::comm::ImgReply>::Create(channel_.get(), rpcmethod_get_batch_stream_, context, request);
+}
+
+void ImageService::Stub::experimental_async::get_batch_stream(::grpc::ClientContext* context, ::comm::BatchRequest* request, ::grpc::experimental::ClientReadReactor< ::comm::ImgReply>* reactor) {
+  ::grpc_impl::internal::ClientCallbackReaderFactory< ::comm::ImgReply>::Create(stub_->channel_.get(), stub_->rpcmethod_get_batch_stream_, context, request, reactor);
+}
+
+::grpc::ClientAsyncReader< ::comm::ImgReply>* ImageService::Stub::Asyncget_batch_streamRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq, void* tag) {
+  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::comm::ImgReply>::Create(channel_.get(), cq, rpcmethod_get_batch_stream_, context, request, true, tag);
+}
+
+::grpc::ClientAsyncReader< ::comm::ImgReply>* ImageService::Stub::PrepareAsyncget_batch_streamRaw(::grpc::ClientContext* context, const ::comm::BatchRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::comm::ImgReply>::Create(channel_.get(), cq, rpcmethod_get_batch_stream_, context, request, false, nullptr);
+}
+
 ImageService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       ImageService_method_names[0],
@@ -104,6 +122,11 @@ ImageService::Service::Service() {
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< ImageService::Service, ::comm::BatchRequest, ::comm::BatchReply>(
           std::mem_fn(&ImageService::Service::get_batch), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      ImageService_method_names[2],
+      ::grpc::internal::RpcMethod::SERVER_STREAMING,
+      new ::grpc::internal::ServerStreamingHandler< ImageService::Service, ::comm::BatchRequest, ::comm::ImgReply>(
+          std::mem_fn(&ImageService::Service::get_batch_stream), this)));
 }
 
 ImageService::Service::~Service() {
@@ -120,6 +143,13 @@ ImageService::Service::~Service() {
   (void) context;
   (void) request;
   (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status ImageService::Service::get_batch_stream(::grpc::ServerContext* context, const ::comm::BatchRequest* request, ::grpc::ServerWriter< ::comm::ImgReply>* writer) {
+  (void) context;
+  (void) request;
+  (void) writer;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
