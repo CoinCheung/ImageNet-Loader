@@ -27,6 +27,7 @@ using std::vector;
 using std::array;
 using std::ios;
 using std::ifstream;
+using std::ofstream;
 using std::stringstream;
 using std::mutex;
 using std::cout;
@@ -67,7 +68,7 @@ ImageServiceImpl::ImageServiceImpl() {
     int64_t len = 1024 * 224 * 224 * 3;
     int64_t buf_len = len * sizeof(float);
     imbuf = new string();
-    imbuf->resize(buf_len);
+    // imbuf->resize(buf_len);
     // TODO: release this
 
 }
