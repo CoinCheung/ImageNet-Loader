@@ -90,15 +90,6 @@ Mat RandomResizedCrop(Mat &im, array<int, 2> size, array<double, 2> scale, array
         i = (W - w) / 2;
         j = (H - h) / 2;
     }
-    // if (!find_roi)  {
-    //     cout << "not find roi\n";
-    //     // cout << "W, H: " << W << ", " << H << endl;
-    //     // cout << "i,j,w,h: " <<i << ", " << j << ", " << w << ", " << h << endl;
-    // } else cout << "find roi\n";
-    // // cout << "W, H: " << i << ", "<< j << ", "<< w << ", "<< h << ", " << W << ", " << H << endl;
-    // cout << "target_area: " << target_area << endl;
-    // cout << "aspect ratio: " << aspect_ratio << endl;
-    // cout << "i,j,w,h: " <<i << ", " << j << ", " << w << ", " << h << endl;
 
     Mat res = im(cv::Rect(i, j, w, h));
     cv::resize(res, res, {size[0], size[1]}, cv::INTER_CUBIC);
@@ -162,7 +153,6 @@ array<array<int64_t, 256>, 3> calcHist(Mat &im) {
             ptr += 3;
         }
     }
-
     return res;
 }
 
@@ -224,7 +214,6 @@ Mat EqualizeFunc(Mat &im) {
             });
     return res;
 }
-
 
 
 Mat AutocontrastFunc(Mat &im, int cutoff) {
@@ -309,9 +298,80 @@ Mat CutoutFunc(Mat &im, int pad_size, array<uint8_t, 3> replace, bool inplace) {
 }
 
 
+inline Mat WarpAffine(Mat &im, Mat &M, array<uint8_t, 3> replace, bool inplace) {
+    Mat res;
+    if (inplace) res = im;
+    cv::warpAffine(im, res, M, im.size(), 
+            cv::INTER_LINEAR,
+            cv::BORDER_CONSTANT, 
+            cv::Scalar(replace[0], replace[1], replace[2]));
+    return res;
+}
+
+
+Mat RotateFunc(Mat &im, float degree, array<uint8_t, 3> replace, bool inplace) {
+    cv::Point2f center(im.cols / 2., im.rows / 2.);
+    Mat M = cv::getRotationMatrix2D(center, degree, 1.);
+    return WarpAffine(im, M, replace, inplace);
+    // Mat res;
+    // if (inplace) res = im;
+    // cv::warpAffine(im, res, M, im.size(),
+    //         cv::INTER_LINEAR,
+    //         cv::BORDER_CONSTANT,
+    //         cv::Scalar(replace[0], replace[1], replace[2]));
+    // return res;
+}
+
+
+Mat ShearXFunc(Mat &im, float factor, array<uint8_t, 3> replace, bool inplace) {
+    Mat M = Mat::eye(2, 3, CV_64FC1);
+    M.at<double>(0, 1) = factor;
+    return WarpAffine(im, M, replace, inplace);
+}
+
+
+Mat ShearYFunc(Mat &im, float factor, array<uint8_t, 3> replace, bool inplace) {
+    Mat M = Mat::eye(2, 3, CV_64FC1);
+    M.at<double>(1, 0) = factor;
+    return WarpAffine(im, M, replace, inplace);
+}
+
+
+Mat TranslateXFunc(Mat &im, float offset, array<uint8_t, 3> replace, bool inplace) {
+    Mat M = Mat::eye(2, 3, CV_64FC1);
+    M.at<double>(0, 2) = -offset;
+    return WarpAffine(im, M, replace, inplace);
+}
+
+
+Mat TranslateYFunc(Mat &im, float offset, array<uint8_t, 3> replace, bool inplace) {
+    Mat M = Mat::eye(2, 3, CV_64FC1);
+    M.at<double>(1, 2) = -offset;
+    return WarpAffine(im, M, replace, inplace);
+}
+
+
+Mat SharpnessFunc(Mat &im, float factor, bool inplace) {
+    Mat kernel = Mat::ones(3, 3, CV_64FC1);
+    kernel.at<double>(1, 1) = 5;
+    kernel = kernel * (1. / 13);
+    Mat res;
+    if (factor == 0) {
+        cv::filter2D(im, res, -1, kernel);
+    } else if (factor == 1) {
+        res = im;
+    } else {
+        Mat degen;
+        cv::filter2D(im, degen, -1, kernel);
+        if (inplace) res = im; else res = im.clone();
+        auto roi = cv::Rect(1, 1, im.cols - 2, im.rows - 2);
+        cv::addWeighted(degen(roi), 1. - factor, im(roi), factor, 0, res(roi));
+    }
+    return res;
+}
+
 
 //// class 
-int TRANSLATE_CONST = 100;
 
 // RandApply
 Mat RandApply::FuncWithProb(Mat &im) {
@@ -349,6 +409,77 @@ Mat Cutout::Func(Mat &im) {
     return  res;
 }
 
-void Cutout::SetMagnitude(set_magnitude) {
-    pad_size = (int)(((float)M / MAX_LEVEL) * cutout_const);
+void Cutout::SetMagnitude(int mag) {
+    pad_size = (int)(((float)mag / MAX_LEVEL) * cutout_const);
+}
+
+
+// Rotate
+Mat Rotate::Func(Mat &im) {
+    Mat res = RotateFunc(im, degree, replace, inplace);
+    return  res;
+}
+
+void Rotate::SetMagnitude(int mag) {
+    degree = ((float)mag / MAX_LEVEL) * 30;
+    if (grandom.rand() < 0.5) degree = -degree;
+}
+
+
+// ShearX
+Mat ShearX::Func(Mat &im) {
+    Mat res = ShearXFunc(im, factor, replace, inplace);
+    return  res;
+}
+
+void ShearX::SetMagnitude(int mag) {
+    factor = ((float)mag / MAX_LEVEL) * 0.3;
+    if (grandom.rand() < 0.5) factor = -factor;
+}
+
+
+// ShearY
+Mat ShearY::Func(Mat &im) {
+    Mat res = ShearYFunc(im, factor, replace, inplace);
+    return  res;
+}
+
+void ShearY::SetMagnitude(int mag) {
+    factor = ((float)mag / MAX_LEVEL) * 0.3;
+    if (grandom.rand() < 0.5) factor = -factor;
+}
+
+
+// TranslateX
+Mat TranslateX::Func(Mat &im) {
+    Mat res = TranslateXFunc(im, offset, replace, inplace);
+    return  res;
+}
+
+void TranslateX::SetMagnitude(int mag) {
+    offset = ((float)mag / MAX_LEVEL) * 100;
+    if (grandom.rand() < 0.5) offset = -offset;
+}
+
+
+// TranslateY
+Mat TranslateY::Func(Mat &im) {
+    Mat res = TranslateYFunc(im, offset, replace, inplace);
+    return  res;
+}
+
+void TranslateY::SetMagnitude(int mag) {
+    offset = ((float)mag / MAX_LEVEL) * 100;
+    if (grandom.rand() < 0.5) offset = -offset;
+}
+
+
+// Sharpness
+Mat Sharpness::Func(Mat &im) {
+    Mat res = SharpnessFunc(im, factor, inplace);
+    return  res;
+}
+
+void Sharpness::SetMagnitude(int mag) {
+    factor = ((float)mag / MAX_LEVEL) * 1.8 + 0.1;
 }

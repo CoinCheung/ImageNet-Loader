@@ -30,9 +30,16 @@ void RandAug::Register_ops() {
     array<uint8_t, 3> replace{128, 128, 128};
     bool inplace = true;
 
-    ops.emplace_back(new Cutout("Cutout", prob, M, cutout_const, replace, inplace));
-    ops.emplace_back(new Equalize("Equalize", prob, M));
-    ops.emplace_back(new Autocontrast("Autocontrast", prob, M, cutoff));
+    // ops.emplace_back(new Cutout("Cutout", prob, M, cutout_const, replace, inplace));
+    // ops.emplace_back(new Equalize("Equalize", prob, M));
+    // ops.emplace_back(new Autocontrast("Autocontrast", prob, M, cutoff));
+    // ops.emplace_back(new Rotate("Rotate", prob, M, replace, inplace));
+    // ops.emplace_back(new ShearX("ShearX", prob, M, replace, inplace));
+    // ops.emplace_back(new ShearY("ShearY", prob, M, replace, inplace));
+    ops.emplace_back(new TranslateX("TranslateX", prob, M, replace, inplace));
+    ops.emplace_back(new TranslateY("TranslateY", prob, M, replace, inplace));
+    ops.emplace_back(new Sharpness("Sharpness", prob, M, inplace));
+
     num_ops = ops.size();
 }
 
