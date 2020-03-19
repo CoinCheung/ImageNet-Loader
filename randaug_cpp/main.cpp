@@ -61,8 +61,12 @@ int main() {
         // hist = EqualizeFunc(im);
         // hist = AutocontrastFunc(im, 0);
         // hist = SharpnessFunc(im, 0.3, true);
+        // hist = ShearXFunc(im, 0.2, {128, 128, 128}, true);
+        // hist = PosterizeFunc(im, 2, true);
+        // hist = ColorFunc(im, 0.6, false);
+        // hist = InvertFunc(im, false);
 
-        hist = ShearXFunc(im, 0.2, {128, 128, 128}, true);
+        hist = ContrastFunc(im, 0.6, true);
     }
 
     dump_bytes(hist);
@@ -80,10 +84,13 @@ int main() {
     // hist = ra[1]->Apply(im);
     // hist = ra[1]->Apply(im);
 
-    // RandAug ra(2, 4);
-    // hist = ra(im);
-    // cv::imwrite("ra_res.jpg", hist);
+    RandAug ra(2, 4);
+    hist = ra(im);
+    cv::imwrite("ra_res.jpg", hist);
 
+    //
+    // float a = 23.88f;
+    // cout << (int)(uint8_t)(a) << endl;
 
     // // RA method 2: c++ std::functional
     // std::function<Mat(Mat&)> cutout_func = std::bind(CutoutFunc, std::placeholders::_1, 40, replace, true);
@@ -190,5 +197,11 @@ int main() {
     //     // res.convertTo(res, CV_8UC3);
     //
     // dump_bytes(res);
+
+    cout << (int)im.at<uint8_t>(1, 1, 0) << endl;
+    cout << (int)im.at<uint8_t>(1, 1) << endl;
+    // cout << (int)im.at<uint8_t>(1, 1) << endl;
+    // cout << (int)im.at<uint8_t>(1, 1) << endl;
+
     return 0;
 }

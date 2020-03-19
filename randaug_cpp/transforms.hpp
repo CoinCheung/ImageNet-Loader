@@ -34,6 +34,10 @@ Mat ShearYFunc(Mat &im,  float factor, array<uint8_t, 3> replace, bool inplace=t
 Mat TranslateXFunc(Mat &im, float offset, array<uint8_t, 3> replace, bool inplace);
 Mat TranslateYFunc(Mat &im, float offset, array<uint8_t, 3> replace, bool inplace);
 Mat SharpnessFunc(Mat &im, float factor, bool inplace);
+Mat PosterizeFunc(Mat &im, int bits, bool inplace);
+Mat ColorFunc(Mat &im, float factor, bool inplace);
+Mat InvertFunc(Mat &im, bool inplace);
+Mat ContrastFunc(Mat &im, float factor, bool inplace);
 
 
 // Trans Objects
@@ -178,6 +182,57 @@ class Sharpness: public RandApply {
         bool inplace;
 
         Sharpness(string name, double p, int mag, bool inplace
+                ): RandApply(name, p, mag), inplace(inplace) {}
+
+        Mat Func(Mat &im) override;
+        void SetMagnitude(int mag) override;
+};
+
+
+class Posterize: public RandApply {
+    public: 
+        int bits; 
+        bool inplace;
+
+        Posterize(string name, double p, int mag, bool inplace
+                ): RandApply(name, p, mag), inplace(inplace) {}
+
+        Mat Func(Mat &im) override;
+        void SetMagnitude(int mag) override;
+};
+
+
+class Color: public RandApply {
+    public: 
+        float factor; 
+        bool inplace;
+
+        Color(string name, double p, int mag, bool inplace
+                ): RandApply(name, p, mag), inplace(inplace) {}
+
+        Mat Func(Mat &im) override;
+        void SetMagnitude(int mag) override;
+};
+
+
+class Invert: public RandApply {
+    public: 
+        bool inplace;
+
+        Invert(string name, double p, int mag, bool inplace
+                ): RandApply(name, p, mag), inplace(inplace) {}
+
+        Mat Func(Mat &im) override;
+        void SetMagnitude(int mag) override;
+};
+
+
+class Contrast: public RandApply {
+    public: 
+        float factor;
+        bool inplace;
+
+        Contrast(string name, double p, int mag, bool inplace
                 ): RandApply(name, p, mag), inplace(inplace) {}
 
         Mat Func(Mat &im) override;

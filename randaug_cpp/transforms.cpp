@@ -277,7 +277,6 @@ Mat AutocontrastFunc(Mat &im, int cutoff) {
 }
 
 
-
 Mat CutoutFunc(Mat &im, int pad_size, array<uint8_t, 3> replace, bool inplace) {
     int H{im.rows}, W{im.cols};
 
@@ -367,6 +366,95 @@ Mat SharpnessFunc(Mat &im, float factor, bool inplace) {
         auto roi = cv::Rect(1, 1, im.cols - 2, im.rows - 2);
         cv::addWeighted(degen(roi), 1. - factor, im(roi), factor, 0, res(roi));
     }
+    return res;
+}
+
+
+Mat PosterizeFunc(Mat &im, int bits, bool inplace) {
+    CHECK_EQ(im.elemSize1(), 1) << "must be uint8_t Mat\n";
+    Mat res;
+    if (inplace) res = im; else res = im.clone();
+    uint8_t mask = (0xff) << (8- bits);
+    res.forEach<cv::Vec3b>([&mask] (cv::Vec3b &pix, const int* pos) {
+            pix[0] &= mask;
+            pix[1] &= mask;
+            pix[2] &= mask;
+    });
+    return res;
+}
+
+
+Mat ColorFunc(Mat &im, float factor, bool inplace) {
+    Mat res;
+    if (inplace) res = im; else res = im.clone();
+    array<float, 3> m1{
+        0.886f * factor + 0.114f,
+        -0.587f * factor + 0.587f,
+        -0.299f * factor + 0.299f};
+    array<float, 3> m2{
+        -0.114f * factor + 0.114f,
+        0.413f * factor + 0.587f,
+        -0.299f * factor + 0.299f};
+    array<float, 3> m3{
+        -0.114f * factor + 0.114f,
+        -0.587f * factor + 0.587f,
+        0.701f * factor + 0.299f};
+
+    res.forEach<cv::Vec3b>([&] (cv::Vec3b &pix, const int* pos) {
+            float r1 = m1[0] * pix[0] + m1[1] * pix[1] + m1[2] * pix[2];
+            float r2 = m2[0] * pix[0] + m2[1] * pix[1] + m2[2] * pix[2];
+            float r3 = m3[0] * pix[0] + m3[1] * pix[1] + m3[2] * pix[2];
+            pix[0] = (uint8_t)std::max(std::min(r1, 255.f), 0.f);
+            pix[1] = (uint8_t)std::max(std::min(r2, 255.f), 0.f);
+            pix[2] = (uint8_t)std::max(std::min(r3, 255.f), 0.f);
+    });
+
+    // float data[3][3] = {
+    //     {0.886f * factor + 0.114f, -0.114f * factor + 0.114f, -0.114f * factor + 0.114f},
+    //     {-0.587f * factor + 0.587f, 0.413f * factor + 0.587f, -0.587f * factor + 0.587f},
+    //     {-0.299f * factor + 0.299f, -0.299f * factor + 0.299f, 0.701f * factor + 0.299f}};
+    // im.convertTo(res, CV_32FC3, 1.);
+    // Mat M = Mat(cv::Size(3, 3), CV_32FC1, &data[0][0]);
+    // res = res * M;
+    return res;
+}
+
+
+Mat InvertFunc(Mat &im, bool inplace) {
+    Mat res;
+    if (inplace) res = im; else res = im.clone();
+    uint8_t byt = 255;
+    res.forEach<cv::Vec3b>([&] (cv::Vec3b &pix, const int* pos) {
+            for (int i{0}; i < 3; ++i) {
+                pix[i] = byt - pix[i];
+            }
+    });
+    return res;
+}
+
+
+// 1. compute gray mode
+// 2. compute mean of the whole gray mode image(one int value rounded)
+// 3. blend the org image with the mean value according to factor
+Mat ContrastFunc(Mat &im, float factor, bool inplace) {
+    Mat res;
+    if (inplace) res = im; else res = im.clone();
+
+    cv::Scalar channel_mean = cv::mean(res);
+    float mean = channel_mean[0] * 0.114 + channel_mean[1] * 0.587 + 0.299 * channel_mean[2]; 
+
+    array<uint8_t, 256> table;
+    float lo{0}, hi{255};
+    for (int i{0}; i < 256; ++i) {
+        float value = (i - mean) * factor + mean;
+        value = std::max(lo, std::min(value, hi));
+        table[i] = static_cast<uint8_t>(value);
+    }
+    res.forEach<cv::Vec3b>([&] (cv::Vec3b &pix, const int* pos) {
+            for (int i{0}; i < 3; ++i) {
+                pix[i] = table[pix[i]];
+            }
+    });
     return res;
 }
 
@@ -481,5 +569,45 @@ Mat Sharpness::Func(Mat &im) {
 }
 
 void Sharpness::SetMagnitude(int mag) {
+    factor = ((float)mag / MAX_LEVEL) * 1.8 + 0.1;
+}
+
+
+// Posterize
+Mat Posterize::Func(Mat &im) {
+    Mat res = PosterizeFunc(im, bits, inplace);
+    return  res;
+}
+
+void Posterize::SetMagnitude(int mag) {
+    bits = (int)(((float)mag / MAX_LEVEL) * 4);
+}
+
+// Color
+Mat Color::Func(Mat &im) {
+    Mat res = ColorFunc(im, factor, inplace);
+    return  res;
+}
+
+void Color::SetMagnitude(int mag) {
+    factor = ((float)mag / MAX_LEVEL) * 1.8 + 0.1;
+}
+
+// Invert 
+Mat Invert::Func(Mat &im) {
+    Mat res = InvertFunc(im, inplace);
+    return  res;
+}
+
+void Invert::SetMagnitude(int mag) {
+}
+
+// Contrast
+Mat Contrast::Func(Mat &im) {
+    Mat res = ContrastFunc(im, factor, inplace);
+    return  res;
+}
+
+void Contrast::SetMagnitude(int mag) {
     factor = ((float)mag / MAX_LEVEL) * 1.8 + 0.1;
 }
