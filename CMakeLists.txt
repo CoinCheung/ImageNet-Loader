@@ -16,16 +16,16 @@ list(APPEND LIGHTSTEP_LINK_LIBRARY ${OpenCV_LIBS})
 ## other link libs
 list(APPEND LIGHTSTEP_LINK_LIBRARY glog pthread)
 
-
 add_subdirectory(src)
 add_subdirectory(third_party/pybind11)
 
+list(APPEND LIGHTSTEP_LINK_LIBRARY loader)
+
 add_executable (main ./main)
-target_link_libraries(main loader ${LIGHTSTEP_LINK_LIBRARY})
-target_link_libraries(main loader)
+target_link_libraries(main ${LIGHTSTEP_LINK_LIBRARY})
 
 pybind11_add_module(dataloader SHARED dataloader.cpp)
-target_link_libraries(dataloader loader ${LIGHTSTEP_LINK_LIBRARY})
+target_link_libraries(dataloader ${LIGHTSTEP_LINK_LIBRARY})
 set_target_properties(dataloader
     PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})

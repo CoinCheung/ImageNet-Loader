@@ -39,6 +39,9 @@ using std::unique_ptr;
 // 3. use basic dataloader, and wipe it to python object
 // 4. use multi-thread
 // 5. use thread pool
+//
+// 1. static library location
+// 2. link static library error
 
 void dump_bytes(Mat im) {
 

@@ -548,7 +548,7 @@ Mat RandApply::FuncWithProb(Mat &im) {
     if (p <= 1 && p > 0 && grandom.rand() < p) {
         SetMagnitude(M);
         res = Func(im);
-        cout << "applying: " << name << endl;
+        // cout << "applying: " << name << endl;
     } else {cout << "not applied by prob\n";}
     return res;
 }

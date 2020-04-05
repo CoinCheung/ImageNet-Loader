@@ -57,8 +57,8 @@ void RandAug::Register_ops() {
 // 3. add operations of implement translateX and translateY
 Mat RandAug::operator()(Mat& im) {
     vector<int64_t> op_idx = grandom.randint(0, num_ops, N);
-    std::copy(op_idx.begin(), op_idx.end(), std::ostream_iterator<int64_t>(std::cout, ", "));
-    std::cout << std::endl;
+    // std::copy(op_idx.begin(), op_idx.end(), std::ostream_iterator<int64_t>(std::cout, ", "));
+    // std::cout << std::endl;
     Mat res = im;
     for (int64_t idx : op_idx) {
         res = ops[idx]->FuncWithProb(res);

@@ -24,11 +24,13 @@ message(${SRC_SO})
 
 # add_library(loader STATIC ${SRC_SO})
 # target_link_libraries(loader ${LIGHTSTEP_LINK_LIBRARY})
+# set_target_properties(loader
+#     PROPERTIES
+#     LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
 
 add_library(loader SHARED ${SRC_SO})
 target_link_libraries(loader ${LIGHTSTEP_LINK_LIBRARY})
-
-# set_target_properties(loader
-#     PROPERTIES
-#     LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
+set_target_properties(loader
+    PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
 
