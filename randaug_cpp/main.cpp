@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <functional>
 #include <utility>
+#include <chrono>
 #include <opencv2/opencv.hpp>
 #include <glog/logging.h>
 
@@ -65,8 +66,11 @@ int main() {
         // hist = PosterizeFunc(im, 2, true);
         // hist = ColorFunc(im, 0.6, false);
         // hist = InvertFunc(im, false);
+        // hist = ContrastFunc(im, 0.6, true);
+        // hist = BrightnessFunc(im, 0.6, true);
+        // hist = SolarizeFunc(im, 70, true);
 
-        hist = ContrastFunc(im, 0.6, true);
+        hist = SolarizeAddFunc(im, 10, 70, true);
     }
 
     dump_bytes(hist);
@@ -198,10 +202,39 @@ int main() {
     //
     // dump_bytes(res);
 
-    cout << (int)im.at<uint8_t>(1, 1, 0) << endl;
-    cout << (int)im.at<uint8_t>(1, 1) << endl;
+    // cout << (int)im.at<uint8_t>(1, 1, 0) << endl;
+    // cout << (int)im.at<uint8_t>(1, 1) << endl;
     // cout << (int)im.at<uint8_t>(1, 1) << endl;
     // cout << (int)im.at<uint8_t>(1, 1) << endl;
 
+
+    // auto t1 = std::chrono::steady_clock::now();
+    // for (int t{0}; t < 100; ++t) {
+    //     vector<int> table(256, 0);
+    //     Mat im2 = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
+    //     im2.forEach<cv::Vec3b>([&table](cv::Vec3b &pix, const int* pos) {
+    //             for (int i{0}; i < 3; ++i) ++table[pix[i]];
+    //     });
+    // }
+    // auto t2 = std::chrono::steady_clock::now();
+    // cout << "time is: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << endl;
+    //
+    // auto t3 = std::chrono::steady_clock::now();
+    // for (int t{0}; t < 100; ++t) {
+    //     // Mat im2 = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
+    //     // cv::Scalar channel_mean = cv::mean(im2);
+    //     vector<int> table(256, 0);
+    //     Mat im2 = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
+    //     for (int r{0}; r < im2.rows; ++r) {
+    //         auto ptr = im2.ptr<uint8_t>(r);
+    //         for (int c{0}; c < im2.cols; ++c) {
+    //             for (int i{0}; i < 3; ++i) ++table[ptr[i]];
+    //             ptr += 3;
+    //         }
+    //     }
+    // }
+    // auto t4 = std::chrono::steady_clock::now();
+    // cout << "time is: " << std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count() << endl;
+    //
     return 0;
 }

@@ -441,7 +441,23 @@ Mat ContrastFunc(Mat &im, float factor, bool inplace) {
     if (inplace) res = im; else res = im.clone();
 
     cv::Scalar channel_mean = cv::mean(res);
-    float mean = channel_mean[0] * 0.114 + channel_mean[1] * 0.587 + 0.299 * channel_mean[2]; 
+    float mean = channel_mean[0] * 0.114 + channel_mean[1] * 0.587 + 0.299 * channel_mean[2];
+
+    // vector<float> means(3, 0);
+    // cv::parallel_for_(cv::Range(0, im.channels()), [&](const cv::Range &range) {
+    //     for (int r{range.start}; r < range.end; ++r) {
+    //         double value{0};
+    //         for (int i{0}; i < im.rows; ++i) {
+    //             uint8_t* ptr = im.ptr<uint8_t>(i);
+    //             for (int j{0}; j < im.cols; ++j) {
+    //                 means[r] += ptr[r];
+    //                 ptr += im.channels();
+    //             }
+    //         }
+    //         means[r] /= im.rows * im.cols;
+    //     }
+    // });
+    // float mean = means[0] * 0.114 + means[1] * 0.587 + means[2] * 0.299;
 
     array<uint8_t, 256> table;
     float lo{0}, hi{255};
@@ -457,6 +473,67 @@ Mat ContrastFunc(Mat &im, float factor, bool inplace) {
     });
     return res;
 }
+
+
+Mat BrightnessFunc(Mat &im, float factor, bool inplace) {
+    Mat res;
+    if (inplace) res = im; else res = im.clone();
+
+    array<uint8_t, 256> table;
+    float lo{0}, hi{255};
+    for (int i{0}; i < 256; ++i) {
+        table[i] = static_cast<uint8_t>(std::max(lo, std::min(factor * i, hi)));
+    }
+    res.forEach<cv::Vec3b>([&] (cv::Vec3b &pix, const int* pos) {
+            for (int i{0}; i < 3; ++i) {
+                pix[i] = table[pix[i]];
+            }
+    });
+    return res;
+}
+
+
+Mat SolarizeFunc(Mat &im, int thresh, bool inplace) {
+    Mat res;
+    if (inplace) res = im; else res = im.clone();
+
+    array<uint8_t, 256> table;
+    for (int i{0}; i < 256; ++i) {
+        if (i < thresh) {
+            table[i] = i;
+        } else {
+            table[i] = 255 - i;
+        }
+    }
+    res.forEach<cv::Vec3b>([&] (cv::Vec3b &pix, const int* pos) {
+            for (int i{0}; i < 3; ++i) {
+                pix[i] = table[pix[i]];
+            }
+    });
+    return res;
+}
+
+
+Mat SolarizeAddFunc(Mat &im, int addition, int thresh, bool inplace) {
+    Mat res;
+    if (inplace) res = im; else res = im.clone();
+
+    array<uint8_t, 256> table;
+    for (int i{0}; i < 256; ++i) {
+        if (i < thresh) {
+            table[i] = std::max(0, std::min(i + addition, 255));
+        } else {
+            table[i] = i;
+        }
+    }
+    res.forEach<cv::Vec3b>([&] (cv::Vec3b &pix, const int* pos) {
+            for (int i{0}; i < 3; ++i) {
+                pix[i] = table[pix[i]];
+            }
+    });
+    return res;
+}
+
 
 
 //// class 
@@ -583,6 +660,7 @@ void Posterize::SetMagnitude(int mag) {
     bits = (int)(((float)mag / MAX_LEVEL) * 4);
 }
 
+
 // Color
 Mat Color::Func(Mat &im) {
     Mat res = ColorFunc(im, factor, inplace);
@@ -593,6 +671,7 @@ void Color::SetMagnitude(int mag) {
     factor = ((float)mag / MAX_LEVEL) * 1.8 + 0.1;
 }
 
+
 // Invert 
 Mat Invert::Func(Mat &im) {
     Mat res = InvertFunc(im, inplace);
@@ -602,6 +681,7 @@ Mat Invert::Func(Mat &im) {
 void Invert::SetMagnitude(int mag) {
 }
 
+
 // Contrast
 Mat Contrast::Func(Mat &im) {
     Mat res = ContrastFunc(im, factor, inplace);
@@ -610,4 +690,37 @@ Mat Contrast::Func(Mat &im) {
 
 void Contrast::SetMagnitude(int mag) {
     factor = ((float)mag / MAX_LEVEL) * 1.8 + 0.1;
+}
+
+
+// Brightness
+Mat Brightness::Func(Mat &im) {
+    Mat res = BrightnessFunc(im, factor, inplace);
+    return  res;
+}
+
+void Brightness::SetMagnitude(int mag) {
+    factor = ((float)mag / MAX_LEVEL) * 1.8 + 0.1;
+}
+
+
+// Solarize
+Mat Solarize::Func(Mat &im) {
+    Mat res = SolarizeFunc(im, thresh, inplace);
+    return  res;
+}
+
+void Solarize::SetMagnitude(int mag) {
+    thresh = static_cast<int>(((float)mag / MAX_LEVEL) * 256);
+}
+
+
+// SolarizeAdd
+Mat SolarizeAdd::Func(Mat &im) {
+    Mat res = SolarizeAddFunc(im, addition, thresh, inplace);
+    return  res;
+}
+
+void SolarizeAdd::SetMagnitude(int mag) {
+    addition = static_cast<int>(((float)mag / MAX_LEVEL) * 110);
 }
