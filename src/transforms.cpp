@@ -20,8 +20,6 @@ using std::array;
 using cv::Mat;
 
 
-// useless var
-int tmp_i = 0;
 // NOTE: it is very import to use same data types as in python. integers should all
 // be int64_t and float should be double by default.
 //
