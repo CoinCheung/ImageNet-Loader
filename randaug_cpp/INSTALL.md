@@ -1,0 +1,13 @@
+
+apt install libgoogle-glog-dev libtiff-dev libzstd-dev libgtk2.0-dev libvcodec-dev libvformat-dev libjpeg-dev libjasper-dev libpcre3 ninja-build
+
+export PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+git clone --depth 1 --recursive https://github.com/opencv/opencv.git third_party/opencv
+
+cd third_party/opencv
+mkdir -p build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DOPENCV_GENERATE_PKGCONFIG=ON -DWITH_TBB=ON -DBUILD_TBB=ON -GNinja
+
+ninja install

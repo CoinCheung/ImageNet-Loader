@@ -192,14 +192,14 @@ impil = Image.open(impth)
 #  out = np.array(ImageOps.invert(impil))[:, :, ::-1].astype(np.float32)
 #  out = np.array(ImageEnhance.Contrast(impil).enhance(0.6)).astype(np.float32)[:,:,::-1]
 #  out = np.array(ImageEnhance.Brightness(impil).enhance(0.6)).astype(np.float32)[:, :, ::-1]
-
-out = np.array(ImageOps.solarize(impil, 70))[:, :, ::-1].astype(np.float32)
 #
-imcpp = np.fromfile('./build/res_cpp.bin', dtype=np.uint8).astype(np.float32)
-print(np.sum(out.ravel() - imcpp))
-print(np.max(out.ravel() - imcpp))
-print(np.min(out.ravel() - imcpp))
-print('find diff')
+#  out = np.array(ImageOps.solarize(impil, 70))[:, :, ::-1].astype(np.float32)
+#  #
+#  imcpp = np.fromfile('./build/res_cpp.bin', dtype=np.uint8).astype(np.float32)
+#  print(np.sum(out.ravel() - imcpp))
+#  print(np.max(out.ravel() - imcpp))
+#  print(np.min(out.ravel() - imcpp))
+#  print('find diff')
 #  for i, (e1, e2) in enumerate(zip(out.ravel(), imcpp)):
 #      #  if e1 != e2:
 #      if e1 != e2:
@@ -233,8 +233,8 @@ print('find diff')
 #  print(np.sum(out.ravel() - imcpp))
 
 #  a, b = degenerate[1:-1, 1:-1, :].ravel(), im[1:-1, 1:-1, :].ravel()
-for i in range(1):
-    out = np.array(ImageEnhance.Contrast(impil).enhance(0.6))
+#  for i in range(1):
+#      out = np.array(ImageEnhance.Contrast(impil).enhance(0.6))
 
 #  imcv = im.transpose((2, 0, 1)).ravel()
 #  print(np.sum(imcv.ravel() - imcpp))
@@ -249,3 +249,6 @@ for i in range(1):
 #  print(hist.astype(np.int64).ravel().dtype)
 #  print(np.bincount(ch.ravel(), minlength=256))
 
+import dataloader
+
+print(dataloader.get_img_by_path('../example.png').shape)

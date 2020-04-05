@@ -15,8 +15,9 @@
 #include <opencv2/opencv.hpp>
 #include <glog/logging.h>
 
-#include "transforms.hpp"
-#include "rand_aug.hpp"
+#include "src/transforms.hpp"
+#include "src/rand_aug.hpp"
+#include "src/pipeline.hpp"
 // #include "randaugment.hpp"
 
 using cv::Mat;
@@ -33,6 +34,11 @@ using std::ofstream;
 using std::unique_ptr;
 
 
+// done 1. use python to load image with image path
+// 2. use python to load a batch
+// 3. use basic dataloader, and wipe it to python object
+// 4. use multi-thread
+// 5. use thread pool
 
 void dump_bytes(Mat im) {
 
@@ -47,8 +53,7 @@ void dump_bytes(Mat im) {
 }
 
 
-
-int main() {
+void test() {
 
     string impth("../../example.png");
     // string impth("/root/139.jpg");
@@ -75,6 +80,11 @@ int main() {
 
     dump_bytes(hist);
 
+    vector<float> *res{nullptr};
+    vector<int> size;
+    LoadTrainImgByPath(impth, res, size);
+    delete res;
+
     // RA method 1: function object
     // array<uint8_t, 3> replace{128, 128, 128};
     // Cutout cutout(0.4, 40, {128, 128, 128}, true);
@@ -88,9 +98,9 @@ int main() {
     // hist = ra[1]->Apply(im);
     // hist = ra[1]->Apply(im);
 
-    RandAug ra(2, 4);
-    hist = ra(im);
-    cv::imwrite("ra_res.jpg", hist);
+    // RandAug ra(2, 4);
+    // hist = ra(im);
+    // cv::imwrite("ra_res.jpg", hist);
 
     //
     // float a = 23.88f;
@@ -236,5 +246,9 @@ int main() {
     // auto t4 = std::chrono::steady_clock::now();
     // cout << "time is: " << std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count() << endl;
     //
+}
+
+int main() {
+    test();
     return 0;
 }

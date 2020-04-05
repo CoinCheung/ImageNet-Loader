@@ -13,23 +13,19 @@ set (OpenCV_DIR /usr/local/lib/cmake/opencv4)
 find_package(OpenCV REQUIRED)
 list(APPEND LIGHTSTEP_LINK_LIBRARY ${OpenCV_LIBS})
 
-
 ## other link libs
 list(APPEND LIGHTSTEP_LINK_LIBRARY glog pthread)
 
 
-aux_source_directory (. SRC_CPP)
-message(${SRC_CPP})
-# set (SRC_CPP
-#     ./main.cpp
-#     ./transforms.cpp
-#     ./random.cpp
-#     ./rand_aug.cpp
-#     ./server.cpp
-# )
+add_subdirectory(src)
+add_subdirectory(third_party/pybind11)
 
-add_executable (main ${SRC_CPP})
-target_link_libraries(main
-    ${SUB_LIBRARY}
-    ${LIGHTSTEP_LINK_LIBRARY}
-)
+add_executable (main ./main)
+target_link_libraries(main loader ${LIGHTSTEP_LINK_LIBRARY})
+target_link_libraries(main loader)
+
+pybind11_add_module(dataloader SHARED dataloader.cpp)
+target_link_libraries(dataloader loader ${LIGHTSTEP_LINK_LIBRARY})
+set_target_properties(dataloader
+    PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})

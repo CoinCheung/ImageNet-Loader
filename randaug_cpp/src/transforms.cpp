@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <iterator>
 #include <cmath>
+#include <cstring>
 #include <sstream>
 #include <opencv2/opencv.hpp>
 #include <glog/logging.h>
@@ -43,9 +44,7 @@ Mat RandomHorizontalFlip(Mat &im, double p, bool inplace) {
         } else {
             cv::flip(im, res, 1); // 0 vflip, 1 hflip, -1 hflip+vflip 
         }
-    } else {
-        res = im;
-    }
+    } else {res = im;}
     return res;
 }
 
@@ -108,13 +107,17 @@ Mat Normalize(Mat &im, array<double, 3> mean, array<double, 3> std) {
 }
 
 
-Mat TransTrain(Mat& im, array<int, 2> size,  bool inplace) {
-    Mat res = RandomResizedCrop(im, size);
-    res = RandomHorizontalFlip(res, inplace);
-    array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
-    res = Normalize(res, mean, std);
-    return res;
-}
+// vector<float> HWC2CHW (Mat &im) {
+//     CHECK (im.depth() == CV_32F || im.depth() == CV_64F)
+//         << "image type must be float32 or float64\n";
+//     Mat res;
+//     if (im.depth() == CV_64F) {
+//         im.convertTo(res, CV_32FC3, 1.);
+//     } else {res = im;}
+//     int size = res.size[0] * res.size[1] * res.elemSize();
+//
+//     vector<float> out(size);
+// }
 
 
 Mat HWC2CHW (Mat &im) {
@@ -130,6 +133,7 @@ Mat HWC2CHW (Mat &im) {
     cv::split(im, planes);
     return res;
 }
+
 
 
 //// random aug funcs
