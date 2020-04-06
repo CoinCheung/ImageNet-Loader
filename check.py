@@ -252,3 +252,8 @@ def brightness_func(img, factor):
 import dataloader
 
 print(dataloader.get_img_by_path('./example.png').shape)
+
+dl = dataloader.CDataLoader("/data/zzy/imagenet/train/", "grpc/train.txt", 32, [224, 224], True)
+
+batch = dl.get_batch()
+print(batch.shape)

@@ -17,7 +17,7 @@
 
 #include "src/transforms.hpp"
 #include "src/rand_aug.hpp"
-#include "src/pipeline.hpp"
+#include "src/dataloader.hpp"
 // #include "randaugment.hpp"
 
 using cv::Mat;

@@ -21,10 +21,10 @@ add_subdirectory(third_party/pybind11)
 
 list(APPEND LIGHTSTEP_LINK_LIBRARY loader)
 
-add_executable (main ./main)
-target_link_libraries(main ${LIGHTSTEP_LINK_LIBRARY})
+# add_executable (main ./dataloader.cpp)
+# target_link_libraries(main ${LIGHTSTEP_LINK_LIBRARY})
 
-pybind11_add_module(dataloader SHARED dataloader.cpp)
+pybind11_add_module(dataloader SHARED wrapper.cpp)
 target_link_libraries(dataloader ${LIGHTSTEP_LINK_LIBRARY})
 set_target_properties(dataloader
     PROPERTIES
