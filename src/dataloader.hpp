@@ -5,6 +5,8 @@
 #include <string>
 #include <array>
 
+#include "pipeline.hpp"
+
 
 using std::vector;
 using std::string;
@@ -15,26 +17,23 @@ class DataLoader {
     public:
         int batchsize;
         string imroot;
-        string annfile;
         int height;
         int width;
-        bool nchw_layout;
+        bool nchw;
         int n_samples;
-        vector<string> img_paths;
-        vector<int> labels;
         vector<int> indices;
         int pos;
         int num_workers;
 
+        DataSet dataset;
+
         DataLoader() {}
         DataLoader(string rootpth, string fname, int bs,
-                vector<int> sz, bool nchw, int n_workers);
+            vector<int> sz, bool nchw, int n_workers);
         virtual ~DataLoader() {}
 
-        void init(string rootpth, string fname, int bs, 
-                vector<int> sz, bool nchw, int n_workers);
+        void init(string rootpth, string fname, vector<int> sz);
         void _get_batch(vector<float>* &data, vector<int>& size);
-        void parse_annos();
         void _shuffle();
         void _restart();
         bool _is_end();

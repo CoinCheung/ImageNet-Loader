@@ -22,14 +22,23 @@ void Mat2Vec (Mat &im, vector<float>* &res, vector<int>& size, bool CHW=true);
 
 class DataSet {
     public: 
+        vector<string> img_paths;
+        vector<int> labels;
+        int n_samples;
         array<int, 2> size;
         bool inplace;
+        bool nchw;
         RandAug ra;
 
-        DataSet(array<int, 2> size={224, 224}, int ra_n=2, int ra_m=9, bool inplace=true): size(size), inplace(inplace) {ra = RandAug(ra_n, ra_m);}
+        // DataSet(string rootpth, string fname, array<int, 2> size={224, 224}, int ra_n=2, int ra_m=9, bool inplace=true): size(size), inplace(inplace) {ra = RandAug(ra_n, ra_m);}
+        DataSet(string rootpth, string fname, array<int, 2> size={224, 224}, bool nchw=true, int ra_n=2, int ra_m=9, bool inplace=true); 
+        DataSet() {}
 
-        Mat operator()(Mat& im);
-        void Mat2Mem (Mat &im, float* res, bool CHW);
+        void parse_annos(string imroot, string annfile);
+        Mat TransTrain(Mat& im);
+        void get_one_by_idx(int idx, float* data);
+        void Mat2Mem (Mat &im, float* res);
+        int get_n_samples();
 };
 
 

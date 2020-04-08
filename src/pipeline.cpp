@@ -3,6 +3,8 @@
 #include <array>
 #include <vector>
 #include <string>
+#include <fstream>
+#include <sstream>
 #include <opencv2/opencv.hpp>
 #include <glog/logging.h>
 
@@ -14,6 +16,9 @@
 using std::endl;
 using std::cout;
 using std::string;
+using std::stringstream;
+using std::ifstream;
+using std::ios;
 using std::array;
 using std::vector;
 using cv::Mat;
@@ -84,7 +89,14 @@ void Mat2Vec (Mat &im, vector<float>* &res, vector<int>& size, bool CHW) {
 
 
 // member function of TransformTrain
-Mat DataSet::operator()(Mat& im) {
+// TODO: write it as register ops
+DataSet::DataSet(string rootpth, string fname, array<int, 2> size, bool nchw, int ra_n, int ra_m, bool inplace): size(size), inplace(inplace), nchw(nchw) {
+    parse_annos(rootpth, fname);
+    ra = RandAug(ra_n, ra_m);
+}
+
+
+Mat DataSet::TransTrain(Mat& im) {
     array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
     Mat res;
     if (inplace) res = im;
@@ -96,11 +108,20 @@ Mat DataSet::operator()(Mat& im) {
 }
 
 
-void DataSet::Mat2Mem (Mat &im, float* res, bool CHW) {
+void DataSet::get_one_by_idx(int idx, float* data) {
+    CHECK(data != nullptr) << "memory not allocated, implement error\n";
+    string impth = img_paths[idx];
+    Mat im = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
+    im = TransTrain(im);
+    Mat2Mem(im, data);
+}
+
+
+void DataSet::Mat2Mem (Mat &im, float* res) {
     CHECK(res != nullptr) << "res should not be nullptr\n";
     int row_size = im.cols * 3;
     int chunk_size = row_size * sizeof(float);
-    if (CHW) {
+    if (nchw) {
         int plane_size = im.rows * im.cols;
         for (int h{0}; h < im.rows; ++h) {
             float* ptr = im.ptr<float>(h);
@@ -122,3 +143,37 @@ void DataSet::Mat2Mem (Mat &im, float* res, bool CHW) {
     }
 }
 
+void DataSet::parse_annos(string imroot, string annfile) {
+    ifstream fin(annfile, ios::in);
+    CHECK(fin) << "file does not exists: " << annfile << endl;
+    stringstream ss;
+    fin >> ss.rdbuf(); // std::noskipws
+    CHECK(!(fin.fail() && fin.eof())) << "error when read ann file\n";
+    fin.close();
+
+    n_samples = 0;
+    string buf;
+    while (std::getline(ss, buf)) {++n_samples;};
+    ss.clear();ss.seekg(0);
+
+    img_paths.resize(n_samples);
+    labels.resize(n_samples);
+    int tmp = 0;
+    if (imroot[imroot.size()-1] == '/') {tmp = 1;}
+    for (int i{0}; i < n_samples; ++i) {
+        ss >> buf >> labels[i];
+        int num_split = tmp;
+        if (buf[0] == '/') ++num_split;
+        if (num_split == 0) {
+            img_paths[i] = imroot + "/" + buf;
+        } else if (num_split == 1) {
+            img_paths[i] = imroot + buf;
+        } else {
+            img_paths[i] = imroot + buf.substr(1);
+        }
+    }
+}
+
+int DataSet::get_n_samples() {
+    return n_samples;
+}
