@@ -251,9 +251,33 @@ def brightness_func(img, factor):
 
 import dataloader
 
-print(dataloader.get_img_by_path('./example.png').shape)
+#  print(dataloader.get_img_by_path('./example.png').shape)
+#
+#  dl = dataloader.CDataLoader("/data/zzy/imagenet/train/", "grpc/train.txt", 32, [224, 224], True)
+#
+#  batch = dl.fetch_batch()
+#  print(batch.shape)
 
-dl = dataloader.CDataLoader("/data/zzy/imagenet/train/", "grpc/train.txt", 32, [224, 224], True)
+class CDataLoader(object):
 
-batch = dl.get_batch()
-print(batch.shape)
+    def __init__(self, imroot, annfile, batchsize, cropsize=(224, 224), shuffle=True, nchw=True, num_worker=4):
+        self.shuffle = shuffle
+        self.dl = dataloader.CDataLoader(imroot, annfile, batchsize, cropsize, nchw, num_worker)
+
+    def __iter__(self):
+        self.dl.restart()
+        if self.shuffle: self.dl.shuffle()
+        return self
+
+    def __next__(self):
+        ##TODO: drop_last
+        if self.dl.is_end():
+            raise StopIteration
+        return self.dl.get_batch()
+
+dl = CDataLoader("/data/zzy/imagenet/train/", "grpc/train.txt", 512, [224, 224], True)
+
+for e in range(1):
+    for i, batch in enumerate(dl):
+        print(i, ": ", batch.shape)
+        if i == 5: break

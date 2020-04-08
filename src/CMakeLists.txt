@@ -22,15 +22,18 @@ aux_source_directory (. SRC_SO)
 # )
 message(${SRC_SO})
 
-# add_library(loader STATIC ${SRC_SO})
+
+add_library(loader STATIC ${SRC_SO})
+target_link_libraries(loader ${LIGHTSTEP_LINK_LIBRARY})
+set_target_properties(loader
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build
+    POSITION_INDEPENDENT_CODE TRUE
+    )
+
+# add_library(loader SHARED ${SRC_SO})
 # target_link_libraries(loader ${LIGHTSTEP_LINK_LIBRARY})
 # set_target_properties(loader
 #     PROPERTIES
 #     LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
-
-add_library(loader SHARED ${SRC_SO})
-target_link_libraries(loader ${LIGHTSTEP_LINK_LIBRARY})
-set_target_properties(loader
-    PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
 

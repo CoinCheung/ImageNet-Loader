@@ -34,33 +34,34 @@ py::array get_img_by_path(py::str impth) {
     return res;
 }
 
-class CDataLoader {
+class CDataLoader: public DataLoader {
     public:
-        DataLoader dl;
-
         CDataLoader(string rootpth, string fname, 
-                int bs, vector<int> size, bool nchw=true
-                );
+                int bs, vector<int> size, bool nchw=true, int n_workers=4
+                ): DataLoader(rootpth, fname, bs, size, nchw, n_workers) {}
         py::array get_batch();
+        void restart();
+        void shuffle();
+        bool is_end();
 };
 
-CDataLoader::CDataLoader(string rootpth, string fname, 
-        int bs, vector<int> size, bool nchw) {
-    dl.init(rootpth, fname, bs, size, nchw);
-}
 
 py::array CDataLoader::get_batch() {
     vector<float> *data{nullptr};
     vector<int> size;
-    dl.get_batch(data, size);
+    _get_batch(data, size);
     CHECK(data != nullptr) << "fetch data error\n";
-    for (auto el: size)
-        cout << el << endl;
     py::capsule cap = py::capsule(data,
         [](void *p) {delete reinterpret_cast<vector<float>*>(p);});
     py::array res = py::array(size, data->data(), cap);
     return res;
 }
+
+void CDataLoader::restart() {_restart();}
+
+void CDataLoader::shuffle() {_shuffle();}
+
+bool CDataLoader::is_end() {_is_end();}
 
 
 PYBIND11_MODULE(dataloader, m) {
@@ -68,6 +69,9 @@ PYBIND11_MODULE(dataloader, m) {
     m.def("get_img_by_path", &get_img_by_path, "get single image float32 array");
 
     py::class_<CDataLoader>(m, "CDataLoader")
-        .def(py::init<string, string, int, vector<int>, bool>())
-        .def("get_batch", &CDataLoader::get_batch);
+        .def(py::init<string, string, int, vector<int>, bool, int>())
+        .def("get_batch", &CDataLoader::get_batch)
+        .def("restart", &CDataLoader::restart)
+        .def("shuffle", &CDataLoader::shuffle)
+        .def("is_end", &CDataLoader::is_end);
 }

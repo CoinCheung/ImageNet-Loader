@@ -6,6 +6,7 @@
 #include <array>
 #include <fstream>
 #include <sstream>
+#include <future>
 #include <glog/logging.h>
 #include <opencv2/opencv.hpp>
 
@@ -27,12 +28,12 @@ using cv::Mat;
 
 
 DataLoader::DataLoader(string rootpth, string fname, int bs,
-        vector<int> sz, bool nchw) {
-    init(rootpth, fname, bs, sz, nchw);
+        vector<int> sz, bool nchw, int n_workers) {
+    init(rootpth, fname, bs, sz, nchw, n_workers);
 }
 
 void DataLoader::init(string rootpth, string fname, int bs,
-        vector<int> sz, bool nchw) {
+        vector<int> sz, bool nchw, int n_workers) {
     n_samples = 0;
     batchsize = bs;
     imroot = rootpth;
@@ -41,11 +42,12 @@ void DataLoader::init(string rootpth, string fname, int bs,
     width = sz[1];
     nchw_layout = nchw;
     parse_annos();
-    std::shuffle(indices.begin(), indices.end(), grandom.engine);
     pos = 0;
+    num_workers = n_workers;
 }
 
-void DataLoader::get_batch(vector<float>* &data, vector<int>& size) {
+void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
+    CHECK_LE(pos + batchsize, n_samples) << "want more samples than n_samples, there can be some logical problem\n";
     int single_size = width * height * 3;
     data = new vector<float>(batchsize * single_size);
     for (int b{0}; b < batchsize; ++b) {
@@ -95,6 +97,19 @@ void DataLoader::parse_annos() {
         }
     }
     std::iota(indices.begin(), indices.end(), 0);
+}
+
+void DataLoader::_shuffle() {
+    std::shuffle(indices.begin(), indices.end(), grandom.engine);
+}
+
+void DataLoader::_restart() {
+    pos = 0;
+}
+
+bool DataLoader::_is_end() {
+    if (pos + batchsize > n_samples) return true;
+    else return false;
 }
 
 // int main () {

@@ -11,7 +11,7 @@ using std::string;
 using std::array;
 
 
-class DataLoader{
+class DataLoader {
     public:
         int batchsize;
         string imroot;
@@ -24,16 +24,20 @@ class DataLoader{
         vector<int> labels;
         vector<int> indices;
         int pos;
+        int num_workers;
 
         DataLoader() {}
         DataLoader(string rootpth, string fname, int bs,
-                vector<int> sz, bool nchw);
+                vector<int> sz, bool nchw, int n_workers);
         virtual ~DataLoader() {}
 
         void init(string rootpth, string fname, int bs, 
-                vector<int> sz, bool nchw);
-        void get_batch(vector<float>* &data, vector<int>& size);
+                vector<int> sz, bool nchw, int n_workers);
+        void _get_batch(vector<float>* &data, vector<int>& size);
         void parse_annos();
+        void _shuffle();
+        void _restart();
+        bool _is_end();
 };
 
 #endif

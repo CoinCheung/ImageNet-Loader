@@ -30,7 +30,6 @@ void LoadTrainImgByPath(string impth, vector<float>* &res, vector<int> &size, bo
 }
 
 
-// TODO: move all the hyperparameters to this function
 Mat TransTrain(Mat& im, array<int, 2> size,  bool inplace) {
     array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
     RandAug ra(2, 9);
@@ -40,33 +39,6 @@ Mat TransTrain(Mat& im, array<int, 2> size,  bool inplace) {
     mat = ra(mat);
     mat = Normalize(mat, mean, std);
     return mat;
-}
-
-
-void Mat2Mem (Mat &im, float* res, bool CHW) {
-    CHECK(res != nullptr) << "res should not be nullptr\n";
-    int row_size = im.cols * 3;
-    int chunk_size = row_size * sizeof(float);
-    if (CHW) {
-        int plane_size = im.rows * im.cols;
-        for (int h{0}; h < im.rows; ++h) {
-            float* ptr = im.ptr<float>(h);
-            int offset_w = 0;
-            for (int w{0}; w < im.cols; ++w) {
-                for (int c{0}; c < 3; ++c) {
-                    int offset = c * plane_size + h * im.cols + w;
-                    res[offset] = ptr[offset_w];
-                    ++offset_w;
-                }
-            }
-        }
-    } else {
-        for (int h{0}; h < im.rows; ++h) {
-            float* ptr = im.ptr<float>(h);
-            int offset_res = row_size * h;
-            memcpy((void*)(res+offset_res), (void*)ptr, chunk_size);
-        }
-    }
 }
 
 void Mat2Vec (Mat &im, vector<float>* &res, vector<int>& size, bool CHW) {
@@ -108,3 +80,45 @@ void Mat2Vec (Mat &im, vector<float>* &res, vector<int>& size, bool CHW) {
         }
     }
 }
+
+
+
+// member function of TransformTrain
+Mat DataSet::operator()(Mat& im) {
+    array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
+    Mat res;
+    if (inplace) res = im;
+    res = RandomResizedCrop(im, size);
+    res = RandomHorizontalFlip(res, inplace);
+    res = ra(res);
+    res = Normalize(res, mean, std);
+    return res;
+}
+
+
+void DataSet::Mat2Mem (Mat &im, float* res, bool CHW) {
+    CHECK(res != nullptr) << "res should not be nullptr\n";
+    int row_size = im.cols * 3;
+    int chunk_size = row_size * sizeof(float);
+    if (CHW) {
+        int plane_size = im.rows * im.cols;
+        for (int h{0}; h < im.rows; ++h) {
+            float* ptr = im.ptr<float>(h);
+            int offset_w = 0;
+            for (int w{0}; w < im.cols; ++w) {
+                for (int c{0}; c < 3; ++c) {
+                    int offset = c * plane_size + h * im.cols + w;
+                    res[offset] = ptr[offset_w];
+                    ++offset_w;
+                }
+            }
+        }
+    } else {
+        for (int h{0}; h < im.rows; ++h) {
+            float* ptr = im.ptr<float>(h);
+            int offset_res = row_size * h;
+            memcpy((void*)(res+offset_res), (void*)ptr, chunk_size);
+        }
+    }
+}
+
