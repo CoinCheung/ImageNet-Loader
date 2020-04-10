@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <chrono>
 #include <vector>
 #include <string>
 #include <numeric>
@@ -47,18 +48,46 @@ void DataLoader::init(string rootpth, string fname, vector<int> sz) {
 
 // TODO: consider drop last 
 void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
+    auto t1 = std::chrono::steady_clock::now();
     CHECK_LE(pos + batchsize, n_samples) << "want more samples than n_samples, there can be some logical problem\n";
+
     int single_size = width * height * 3;
     data = new vector<float>(batchsize * single_size);
-    for (int b{0}; b < batchsize; ++b) {
-        dataset.get_one_by_idx(indices[pos], &((*data)[b * single_size]));
-        ++pos;
+    int bs_thread = batchsize / num_workers + 1;
+    auto thread_func = [&](int thread_idx) {
+        for (int i{0}; i < bs_thread; ++i) {
+            int pos_thread = i * num_workers + thread_idx;
+            if (pos_thread >= batchsize) break;
+            dataset.get_one_by_idx(
+                    indices[pos + pos_thread],
+                    &((*data)[pos_thread * single_size])
+                    );
+        }
+    };
+
+    auto t2 = std::chrono::steady_clock::now();
+    vector<std::future<void>> tpool(num_workers);
+    for (int i{0}; i < num_workers; ++i) {
+        tpool[i] = std::async(std::launch::async, thread_func, i);
     }
+    for (int i{0}; i < num_workers; ++i) {
+        tpool[i].get();
+    }
+    pos += batchsize;
+    auto t3 = std::chrono::steady_clock::now();
+
+
     if (nchw) {
         size = {batchsize, 3, height, width};
     } else {
         size = {batchsize, height, width, 3};
     }
+    auto t4 = std::chrono::steady_clock::now();
+    //
+    // cout << "prepare thread_func and memory: "
+    //     << std::chrono::duration<double, std::milli>(t2 - t1).count() << endl;
+    // cout << "processing: "
+    //     << std::chrono::duration<double, std::milli>(t3 - t2).count() << endl;
 }
 
 // void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
@@ -96,24 +125,25 @@ bool DataLoader::_is_end() {
     else return false;
 }
 
-int main () {
-    string imroot("/data/zzy/imagenet/train/");
-    string annfile("../grpc/train.txt");
-    DataLoader dl(imroot, annfile, 128, {224, 224}, true, 4);
-    for (int i{0}; i < 10; ++i) {
-        cout << dl.dataset.img_paths[i] << endl;
-    }
-    for (int i{0}; i < 10; ++i) {
-        cout << dl.indices[i] << endl;
-    }
-
-    vector<float> *batch;
-    vector<int> size;
-    cout << "run get batch: " << endl;
-    dl._get_batch(batch, size);
-    cout << "batch size: "; 
-    for (auto& el : size) cout << el << ", "; cout << endl;
-    cout << batch->size() << endl;
-
-    return 0;
-}
+//
+// int main () {
+//     string imroot("/data/zzy/imagenet/train/");
+//     string annfile("../grpc/train.txt");
+//     DataLoader dl(imroot, annfile, 128, {224, 224}, true, 4);
+//     for (int i{0}; i < 10; ++i) {
+//         cout << dl.dataset.img_paths[i] << endl;
+//     }
+//     for (int i{0}; i < 10; ++i) {
+//         cout << dl.indices[i] << endl;
+//     }
+//
+//     vector<float> *batch;
+//     vector<int> size;
+//     cout << "run get batch: " << endl;
+//     dl._get_batch(batch, size);
+//     cout << "batch size: ";
+//     for (auto& el : size) cout << el << ", "; cout << endl;
+//     cout << batch->size() << endl;
+//
+//     return 0;
+// }

@@ -50,10 +50,14 @@ py::array CDataLoader::get_batch() {
     vector<float> *data{nullptr};
     vector<int> size;
     _get_batch(data, size);
+    auto t1 = std::chrono::steady_clock::now();
     CHECK(data != nullptr) << "fetch data error\n";
     py::capsule cap = py::capsule(data,
         [](void *p) {delete reinterpret_cast<vector<float>*>(p);});
     py::array res = py::array(size, data->data(), cap);
+    auto t2 = std::chrono::steady_clock::now();
+    // cout << "after _get_batch_ called: "
+    //     << std::chrono::duration<double, std::milli>(t2 - t1).count() << endl;
     return res;
 }
 

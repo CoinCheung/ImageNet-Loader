@@ -260,9 +260,9 @@ import dataloader
 
 class CDataLoader(object):
 
-    def __init__(self, imroot, annfile, batchsize, cropsize=(224, 224), shuffle=True, nchw=True, num_worker=4):
+    def __init__(self, imroot, annfile, batchsize, cropsize=(224, 224), shuffle=True, nchw=True, num_workers=4):
         self.shuffle = shuffle
-        self.dl = dataloader.CDataLoader(imroot, annfile, batchsize, cropsize, nchw, num_worker)
+        self.dl = dataloader.CDataLoader(imroot, annfile, batchsize, cropsize, nchw, num_workers)
 
     def __iter__(self):
         self.dl.restart()
@@ -275,9 +275,14 @@ class CDataLoader(object):
             raise StopIteration
         return self.dl.get_batch()
 
-dl = CDataLoader("/data/zzy/imagenet/train/", "grpc/train.txt", 512, [224, 224], True)
+batchsize = 256
+num_workers = 48
+dl = CDataLoader("/data/zzy/imagenet/train/", "grpc/train.txt", batchsize, [224, 224], True, num_workers=num_workers)
 
 for e in range(1):
     for i, batch in enumerate(dl):
         print(i, ": ", batch.shape)
         if i == 5: break
+
+print(batch[0, 1, :4, :3])
+print(batch[1, 1, :4, :3])

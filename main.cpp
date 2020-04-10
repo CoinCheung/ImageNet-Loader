@@ -35,10 +35,11 @@ using std::unique_ptr;
 
 
 // done 1. use python to load image with image path
-// 2. use python to load a batch
-// 3. use basic dataloader, and wipe it to python object
+// done 2. use python to load a batch
+// done 3. use basic dataloader, and wipe it to python object
 // 4. use multi-thread
-// 5. use thread pool
+// 5. prefetch
+// 6. use thread pool
 //
 // 1. static library location
 // 2. link static library error
