@@ -30,10 +30,10 @@ class DataSet {
         bool nchw;
         RandAug ra;
 
-        // DataSet(string rootpth, string fname, array<int, 2> size={224, 224}, int ra_n=2, int ra_m=9, bool inplace=true): size(size), inplace(inplace) {ra = RandAug(ra_n, ra_m);}
         DataSet(string rootpth, string fname, array<int, 2> size={224, 224}, bool nchw=true, int ra_n=2, int ra_m=9, bool inplace=true); 
         DataSet() {}
 
+        // void init(string rootpth, string fname, array<int, 2> size={224, 224}, bool nchw=true, int ra_n=2, int ra_m=9, bool inplace=true);
         void parse_annos(string imroot, string annfile);
         Mat TransTrain(Mat& im);
         void get_one_by_idx(int idx, float* data);

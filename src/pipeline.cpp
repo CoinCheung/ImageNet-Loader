@@ -95,6 +95,14 @@ DataSet::DataSet(string rootpth, string fname, array<int, 2> size, bool nchw, in
     ra = RandAug(ra_n, ra_m);
 }
 
+// void DataSet::init(string rootpth, string fname, array<int, 2> sz, bool use_nchw, int ra_n, int ra_m, bool use_inplace) {
+//     parse_annos(rootpth, fname);
+//     ra = RandAug(ra_n, ra_m);
+//     size = sz;
+//     nchw = use_nchw;
+//     inplace = use_inplace;
+// }
+
 
 Mat DataSet::TransTrain(Mat& im) {
     array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
@@ -159,7 +167,8 @@ void DataSet::parse_annos(string imroot, string annfile) {
     img_paths.resize(n_samples);
     labels.resize(n_samples);
     int tmp = 0;
-    if (imroot[imroot.size()-1] == '/') {tmp = 1;}
+    // if (imroot[imroot.size()-1] == '/') {tmp = 1;}
+    if (imroot.back() == '/') {tmp = 1;}
     for (int i{0}; i < n_samples; ++i) {
         ss >> buf >> labels[i];
         int num_split = tmp;

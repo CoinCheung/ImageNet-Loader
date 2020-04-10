@@ -38,6 +38,7 @@ void DataLoader::init(string rootpth, string fname, vector<int> sz) {
     width = sz[1];
     pos = 0;
 
+    // dataset.init(rootpth, fname, {height, width}, nchw);
     dataset = DataSet(rootpth, fname, {height, width}, nchw);
     n_samples = dataset.get_n_samples();
     indices.resize(n_samples);
@@ -53,13 +54,10 @@ void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
         dataset.get_one_by_idx(indices[pos], &((*data)[b * single_size]));
         ++pos;
     }
-    size.resize(4);
     if (nchw) {
-        size[0] = batchsize;size[1] = 3;
-        size[2] = height;size[3] = width;
+        size = {batchsize, 3, height, width};
     } else {
-        size[0] = batchsize;size[1] = height;
-        size[2] = width;size[3] = 3;
+        size = {batchsize, height, width, 3};
     }
 }
 
