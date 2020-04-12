@@ -29,8 +29,9 @@ using cv::Mat;
 
 
 DataLoader::DataLoader(string rootpth, string fname, int bs,
-        vector<int> sz, bool nchw, int n_workers): batchsize(bs),
-        nchw(nchw), num_workers(n_workers) {
+        vector<int> sz, bool nchw, int n_workers, bool drop_last):
+        batchsize(bs), nchw(nchw), num_workers(n_workers),
+        drop_last(drop_last) {
     init(rootpth, fname, sz);
 }
 
@@ -46,18 +47,20 @@ void DataLoader::init(string rootpth, string fname, vector<int> sz) {
     std::iota(indices.begin(), indices.end(), 0);
 }
 
-// TODO: consider drop last 
+
 void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
     auto t1 = std::chrono::steady_clock::now();
-    CHECK_LE(pos + batchsize, n_samples) << "want more samples than n_samples, there can be some logical problem\n";
+    CHECK (!_is_end()) << "want more samples than n_samples, there can be some logical problem\n";
+    int n_batch = batchsize;
+    if (pos + batchsize > n_samples) n_batch = n_samples - pos;
 
     int single_size = width * height * 3;
-    data = new vector<float>(batchsize * single_size);
-    int bs_thread = batchsize / num_workers + 1;
+    data = new vector<float>(n_batch * single_size);
+    int bs_thread = n_batch / num_workers + 1;
     auto thread_func = [&](int thread_idx) {
         for (int i{0}; i < bs_thread; ++i) {
             int pos_thread = i * num_workers + thread_idx;
-            if (pos_thread >= batchsize) break;
+            if (pos_thread >= n_batch) break;
             dataset.get_one_by_idx(
                     indices[pos + pos_thread],
                     &((*data)[pos_thread * single_size])
@@ -73,14 +76,14 @@ void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
     for (int i{0}; i < num_workers; ++i) {
         tpool[i].get();
     }
-    pos += batchsize;
+    pos += n_batch;
     auto t3 = std::chrono::steady_clock::now();
 
 
     if (nchw) {
-        size = {batchsize, 3, height, width};
+        size = {n_batch, 3, height, width};
     } else {
-        size = {batchsize, height, width, 3};
+        size = {n_batch, height, width, 3};
     }
     auto t4 = std::chrono::steady_clock::now();
     //
@@ -121,8 +124,10 @@ void DataLoader::_restart() {
 }
 
 bool DataLoader::_is_end() {
-    if (pos + batchsize > n_samples) return true;
-    else return false;
+    if ((pos >= n_samples) ||
+            ((pos + batchsize > n_samples) && drop_last)) {
+        return true;
+    } else return false;
 }
 
 //

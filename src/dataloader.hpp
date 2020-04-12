@@ -24,12 +24,13 @@ class DataLoader {
         vector<int> indices;
         int pos;
         int num_workers;
+        bool drop_last;
 
         DataSet dataset;
 
         DataLoader() {}
         DataLoader(string rootpth, string fname, int bs,
-            vector<int> sz, bool nchw, int n_workers);
+            vector<int> sz, bool nchw, int n_workers, bool drop_last);
         virtual ~DataLoader() {}
 
         void init(string rootpth, string fname, vector<int> sz);

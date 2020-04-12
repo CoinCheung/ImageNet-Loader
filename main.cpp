@@ -37,12 +37,16 @@ using std::unique_ptr;
 // done 1. use python to load image with image path
 // done 2. use python to load a batch
 // done 3. use basic dataloader, and wipe it to python object
-// 4. use multi-thread
+// done 4. use multi-thread
 // 5. prefetch
 // 6. use thread pool
+// 7. see if pytorch release memories without capsule, use self memory pool
 //
-// 1. static library location
-// 2. link static library error
+// done 1. static library location
+// done 2. link static library error
+//
+// 结论: 1. torch和numpy一样，是共用的， from_numpy之后就是shared_ptr这种，del一个只会减小一个引用，两个都delete之后才会真正释放
+// 2. cuda()之后如果没有其他引用的话，也会都释放掉的
 
 void dump_bytes(Mat im) {
 
