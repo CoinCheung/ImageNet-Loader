@@ -14,7 +14,7 @@ find_package(OpenCV REQUIRED)
 list(APPEND LIGHTSTEP_LINK_LIBRARY ${OpenCV_LIBS})
 
 ## other link libs
-list(APPEND LIGHTSTEP_LINK_LIBRARY glog pthread)
+list(APPEND LIGHTSTEP_LINK_LIBRARY glog pthread )
 
 add_subdirectory(src)
 add_subdirectory(third_party/pybind11)

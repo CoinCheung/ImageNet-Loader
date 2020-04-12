@@ -10,7 +10,7 @@ list(APPEND LIGHTSTEP_LINK_LIBRARY ${OpenCV_LIBS})
 
 
 ## other link libs
-list(APPEND LIGHTSTEP_LINK_LIBRARY glog pthread)
+list(APPEND LIGHTSTEP_LINK_LIBRARY glog pthread )
 
 
 aux_source_directory (. SRC_SO)

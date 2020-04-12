@@ -1,5 +1,5 @@
 
-apt install libgoogle-glog-dev libtiff-dev libzstd-dev libgtk2.0-dev libvcodec-dev libvformat-dev libjpeg-dev libjasper-dev libpcre3 ninja-build
+apt install libgoogle-glog-dev libtiff-dev libgoogle-perftools-dev libzstd-dev libgtk2.0-dev libvcodec-dev libvformat-dev libjpeg-dev libjasper-dev libpcre3 ninja-build
 
 export PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
