@@ -27,16 +27,18 @@ class DataSet {
         int n_samples;
         array<int, 2> size;
         bool inplace;
+        bool is_train;
         bool nchw;
         RandAug ra;
 
-        DataSet(string rootpth, string fname, array<int, 2> size={224, 224}, bool nchw=true, int ra_n=2, int ra_m=9, bool inplace=true); 
+        DataSet(string rootpth, string fname, array<int, 2> size={224, 224}, bool train=true, bool nchw=true, int ra_n=2, int ra_m=9, bool inplace=true); 
         DataSet() {}
 
         // void init(string rootpth, string fname, array<int, 2> size={224, 224}, bool nchw=true, int ra_n=2, int ra_m=9, bool inplace=true);
         void parse_annos(string imroot, string annfile);
         Mat TransTrain(Mat& im);
-        void get_one_by_idx(int idx, float* data);
+        Mat TransVal(Mat& im);
+        void get_one_by_idx(int idx, float* data, int& lb);
         void Mat2Mem (Mat &im, float* res);
         int get_n_samples();
 };

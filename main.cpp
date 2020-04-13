@@ -38,9 +38,10 @@ using std::unique_ptr;
 // done 2. use python to load a batch
 // done 3. use basic dataloader, and wipe it to python object
 // done 4. use multi-thread
-// 5. prefetch
-// 6. use thread pool
-// 7. see if pytorch release memories without capsule, use self memory pool
+// 5. distributed
+// 6. prefetch
+// 7. use thread pool
+// 8. see if pytorch release memories without capsule, use self memory pool
 //
 // done 1. static library location
 // done 2. link static library error

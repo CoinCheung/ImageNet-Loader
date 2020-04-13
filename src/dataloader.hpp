@@ -30,11 +30,12 @@ class DataLoader {
 
         DataLoader() {}
         DataLoader(string rootpth, string fname, int bs,
-            vector<int> sz, bool nchw, int n_workers, bool drop_last);
+            vector<int> sz, bool nchw, bool train, int n_workers,
+            bool drop_last);
         virtual ~DataLoader() {}
 
-        void init(string rootpth, string fname, vector<int> sz);
-        void _get_batch(vector<float>* &data, vector<int>& size);
+        void init(string rootpth, string fname, vector<int> sz, bool is_train);
+        void _get_batch(vector<float>* &data, vector<int>& size, vector<int>* &labels);
         void _shuffle();
         void _restart();
         bool _is_end();

@@ -59,9 +59,7 @@ void Mat2Vec (Mat &im, vector<float>* &res, vector<int>& size, bool CHW) {
 
     size.resize(3);
     if (CHW) {
-        size[0] = 3;
-        size[1] = im.rows;
-        size[2] = im.cols;
+        size = {3, im.rows, im.cols};
         int plane_size = im.rows * im.cols;
         for (int h{0}; h < im.rows; ++h) {
             float* ptr = im.ptr<float>(h);
@@ -75,9 +73,7 @@ void Mat2Vec (Mat &im, vector<float>* &res, vector<int>& size, bool CHW) {
             }
         }
     } else {
-        size[0] = im.rows;
-        size[1] = im.cols;
-        size[2] = 3;
+        size = {im.rows, im.cols, 3};
         for (int h{0}; h < im.rows; ++h) {
             float* ptr = im.ptr<float>(h);
             int offset_res = row_size * h;
@@ -90,7 +86,7 @@ void Mat2Vec (Mat &im, vector<float>* &res, vector<int>& size, bool CHW) {
 
 // member function of TransformTrain
 // TODO: write it as register ops
-DataSet::DataSet(string rootpth, string fname, array<int, 2> size, bool nchw, int ra_n, int ra_m, bool inplace): size(size), inplace(inplace), nchw(nchw) {
+DataSet::DataSet(string rootpth, string fname, array<int, 2> size, bool is_train, bool nchw, int ra_n, int ra_m, bool inplace): size(size), inplace(inplace), is_train(is_train), nchw(nchw) {
     parse_annos(rootpth, fname);
     ra = RandAug(ra_n, ra_m);
 }
@@ -115,13 +111,27 @@ Mat DataSet::TransTrain(Mat& im) {
     return res;
 }
 
+Mat DataSet::TransVal(Mat& im) {
+    array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
+    Mat res;
+    if (inplace) res = im;
+    res = ResizeCenterCrop(im, size);
+    res = Normalize(res, mean, std);
+    return res;
+}
 
-void DataSet::get_one_by_idx(int idx, float* data) {
+
+void DataSet::get_one_by_idx(int idx, float* data, int& label) {
     CHECK(data != nullptr) << "memory not allocated, implement error\n";
     string impth = img_paths[idx];
     Mat im = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
-    im = TransTrain(im);
+    if (is_train) {
+        im = TransTrain(im);
+    } else {
+        im = TransVal(im);
+    }
     Mat2Mem(im, data);
+    label = labels[idx];
 }
 
 

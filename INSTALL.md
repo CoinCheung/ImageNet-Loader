@@ -3,6 +3,7 @@ apt install libgoogle-glog-dev libtiff-dev libgoogle-perftools-dev libzstd-dev l
 
 export PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
+git clone --depth 1 --recursive https://github.com/pybind/pybind11.git third_party/pybind11
 git clone --depth 1 --recursive https://github.com/opencv/opencv.git third_party/opencv
 
 cd third_party/opencv

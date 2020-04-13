@@ -29,26 +29,26 @@ using cv::Mat;
 
 
 DataLoader::DataLoader(string rootpth, string fname, int bs,
-        vector<int> sz, bool nchw, int n_workers, bool drop_last):
-        batchsize(bs), nchw(nchw), num_workers(n_workers),
-        drop_last(drop_last) {
-    init(rootpth, fname, sz);
+        vector<int> sz, bool nchw, bool train, int n_workers, 
+        bool drop_last):batchsize(bs), nchw(nchw),
+        num_workers(n_workers), drop_last(drop_last) {
+    init(rootpth, fname, sz, train);
 }
 
-void DataLoader::init(string rootpth, string fname, vector<int> sz) {
+void DataLoader::init(string rootpth, string fname, vector<int> sz, bool train) {
     height = sz[0];
     width = sz[1];
     pos = 0;
 
     // dataset.init(rootpth, fname, {height, width}, nchw);
-    dataset = DataSet(rootpth, fname, {height, width}, nchw);
+    dataset = DataSet(rootpth, fname, {height, width}, train, nchw);
     n_samples = dataset.get_n_samples();
     indices.resize(n_samples);
     std::iota(indices.begin(), indices.end(), 0);
 }
 
 
-void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
+void DataLoader::_get_batch(vector<float>* &data, vector<int>& size, vector<int>* &labels) {
     auto t1 = std::chrono::steady_clock::now();
     CHECK (!_is_end()) << "want more samples than n_samples, there can be some logical problem\n";
     int n_batch = batchsize;
@@ -56,6 +56,7 @@ void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
 
     int single_size = width * height * 3;
     data = new vector<float>(n_batch * single_size);
+    labels = new vector<int>(n_batch);
     int bs_thread = n_batch / num_workers + 1;
     auto thread_func = [&](int thread_idx) {
         for (int i{0}; i < bs_thread; ++i) {
@@ -63,7 +64,8 @@ void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
             if (pos_thread >= n_batch) break;
             dataset.get_one_by_idx(
                     indices[pos + pos_thread],
-                    &((*data)[pos_thread * single_size])
+                    &((*data)[pos_thread * single_size]),
+                    (*labels)[pos_thread]
                     );
         }
     };
@@ -78,7 +80,6 @@ void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
     }
     pos += n_batch;
     auto t3 = std::chrono::steady_clock::now();
-
 
     if (nchw) {
         size = {n_batch, 3, height, width};

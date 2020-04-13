@@ -95,6 +95,24 @@ Mat RandomResizedCrop(Mat &im, array<int, 2> size, array<double, 2> scale, array
 }
 
 
+Mat ResizeCenterCrop(Mat &im, array<int, 2> size) {
+    int H{im.rows}, W{im.cols};
+    int th{size[0]}, tw{size[1]};
+    int w, h;
+    if (W < H) {
+        w = tw + 32;
+        h = static_cast<int>(w * H / W);
+    } else {
+        h = th + 32;
+        w = static_cast<int>(h * W / H);
+    }
+    Mat res;
+    cv::resize(im, res, {w, h}, cv::INTER_CUBIC);
+    int i{(w - tw) >> 1}, j{(h - th) >> 1};
+    res = res(cv::Rect(i, j, tw, th));
+    return res;
+}
+
 Mat Normalize(Mat &im, array<double, 3> mean, array<double, 3> std) {
     Mat res;
     im.convertTo(res, CV_32FC3, 1. / 255);

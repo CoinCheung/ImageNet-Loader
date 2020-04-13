@@ -38,29 +38,34 @@ py::array get_img_by_path(py::str impth) {
 class CDataLoader: public DataLoader {
     public:
         CDataLoader(string rootpth, string fname, 
-                int bs, vector<int> size, bool nchw=true, int n_workers=4,
-                bool drop_last=true
-                ): DataLoader(rootpth, fname, bs, size, nchw, n_workers, drop_last) {}
-        py::array get_batch();
+                int bs, vector<int> size, bool nchw=true, bool train=true, 
+                int n_workers=4, bool drop_last=true
+                ): DataLoader(rootpth, fname, bs, size, nchw, train, n_workers, drop_last) {}
+        py::tuple get_batch();
         void restart();
         void shuffle();
         bool is_end();
 };
 
 
-py::array CDataLoader::get_batch() {
+py::tuple CDataLoader::get_batch() {
     vector<float> *data{nullptr};
     vector<int> size;
-    _get_batch(data, size);
+    vector<int> *labels{nullptr};
+    _get_batch(data, size, labels);
     auto t1 = std::chrono::steady_clock::now();
-    CHECK(data != nullptr) << "fetch data error\n";
-    py::capsule cap = py::capsule(data,
+    CHECK((data != nullptr) && (labels != nullptr)) << "fetch data error\n";
+    py::capsule cap_data = py::capsule(data,
         [](void *p) {delete reinterpret_cast<vector<float>*>(p);});
-    py::array res = py::array(size, data->data(), cap);
+    py::array res_data = py::array(size, data->data(), cap_data);
+    py::capsule cap_lb = py::capsule(labels,
+        [](void *p) {delete reinterpret_cast<vector<int>*>(p);});
+    py::array res_label = py::array({size[0]}, labels->data(), cap_lb);
     auto t2 = std::chrono::steady_clock::now();
     // cout << "after _get_batch_ called: "
     //     << std::chrono::duration<double, std::milli>(t2 - t1).count() << endl;
-    return res;
+    // return res;
+    return py::make_tuple(res_data, res_label);
 }
 
 void CDataLoader::restart() {_restart();}
@@ -75,7 +80,7 @@ PYBIND11_MODULE(dataloader, m) {
     m.def("get_img_by_path", &get_img_by_path, "get single image float32 array");
 
     py::class_<CDataLoader>(m, "CDataLoader")
-        .def(py::init<string, string, int, vector<int>, bool, int, bool>())
+        .def(py::init<string, string, int, vector<int>, bool, bool, int, bool>())
         .def("get_batch", &CDataLoader::get_batch)
         .def("restart", &CDataLoader::restart)
         .def("shuffle", &CDataLoader::shuffle)
