@@ -151,6 +151,10 @@ void DataLoader::_split_by_rank() {
     }
 }
 
+int DataLoader::_get_length() {
+    return n_all_samples;
+}
+
 
 //
 // int main () {

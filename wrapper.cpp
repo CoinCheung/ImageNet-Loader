@@ -49,6 +49,7 @@ class CDataLoader: public DataLoader {
         bool is_end();
         void set_epoch(int ep);
         void init_dist(int rank, int num_ranks);
+        int64_t get_length();
 };
 
 
@@ -84,6 +85,8 @@ void CDataLoader::set_epoch(int ep) {_set_epoch(ep);}
 
 void CDataLoader::init_dist(int rank, int num_ranks) {_init_dist(rank, num_ranks);}
 
+int64_t CDataLoader::get_length() {return _get_length();}
+
 
 PYBIND11_MODULE(dataloader, m) {
     m.doc() = "load image with c++";
@@ -97,5 +100,6 @@ PYBIND11_MODULE(dataloader, m) {
         .def("shuffle", &CDataLoader::shuffle)
         .def("is_end", &CDataLoader::is_end)
         .def("set_epoch", &CDataLoader::set_epoch)
-        .def("init_dist", &CDataLoader::init_dist);
+        .def("init_dist", &CDataLoader::init_dist)
+        .def("get_length", &CDataLoader::get_length);
 }

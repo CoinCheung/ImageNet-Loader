@@ -53,6 +53,7 @@ class DataLoader {
         void _set_epoch(int ep);
         void _init_dist(int rank, int num_ranks);
         void _split_by_rank();
+        int _get_length();
 };
 
 #endif

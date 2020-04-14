@@ -50,6 +50,9 @@ class CDataLoader(object):
     def init_dist(self, rank=0, num_ranks=1):
         self.dl.init_dist(rank, num_ranks)
 
+    def __len__(self):
+        return self.dl.get_length()
+
 
 print('create loader')
 batchsize = 256
@@ -72,3 +75,4 @@ for e in range(2):
 
 #  print(batch[0, 1, :4, :3])
 #  print(batch[1, 1, :4, :3])
+print('ds len: ', len(dl))
