@@ -55,7 +55,7 @@ class CDataLoader: public DataLoader {
 py::tuple CDataLoader::get_batch() {
     vector<float> *data{nullptr};
     vector<int> size;
-    vector<int> *labels{nullptr};
+    vector<int64_t> *labels{nullptr};
     _get_batch(data, size, labels);
     auto t1 = std::chrono::steady_clock::now();
     CHECK((data != nullptr) && (labels != nullptr)) << "fetch data error\n";
@@ -63,7 +63,7 @@ py::tuple CDataLoader::get_batch() {
         [](void *p) {delete reinterpret_cast<vector<float>*>(p);});
     py::array res_data = py::array(size, data->data(), cap_data);
     py::capsule cap_lb = py::capsule(labels,
-        [](void *p) {delete reinterpret_cast<vector<int>*>(p);});
+        [](void *p) {delete reinterpret_cast<vector<int64_t>*>(p);});
     py::array res_label = py::array({size[0]}, labels->data(), cap_lb);
     auto t2 = std::chrono::steady_clock::now();
     // cout << "after _get_batch_ called: "

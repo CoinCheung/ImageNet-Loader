@@ -41,7 +41,9 @@ using std::unique_ptr;
 // done 5. distributed, check shuffle/no-shuffle, dist/no-dist
 // 6. prefetch
 // 7. use thread pool
-// 8. see if pytorch release memories without capsule, use self memory pool
+// discard 8. see if pytorch release memories without capsule, use self memory pool
+// 9. add method for __len__()
+//  
 //
 // done 1. static library location
 // done 2. link static library error

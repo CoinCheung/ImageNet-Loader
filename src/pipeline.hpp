@@ -23,7 +23,7 @@ void Mat2Vec (Mat &im, vector<float>* &res, vector<int>& size, bool CHW=true);
 class DataSet {
     public: 
         vector<string> img_paths;
-        vector<int> labels;
+        vector<int64_t> labels;
         int n_samples;
         array<int, 2> size;
         bool inplace;
@@ -38,7 +38,7 @@ class DataSet {
         void parse_annos(string imroot, string annfile);
         Mat TransTrain(Mat& im);
         Mat TransVal(Mat& im);
-        void get_one_by_idx(int idx, float* data, int& lb);
+        void get_one_by_idx(int idx, float* data, int64_t& lb);
         void Mat2Mem (Mat &im, float* res);
         int get_n_samples();
 };

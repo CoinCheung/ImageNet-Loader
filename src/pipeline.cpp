@@ -121,7 +121,7 @@ Mat DataSet::TransVal(Mat& im) {
 }
 
 
-void DataSet::get_one_by_idx(int idx, float* data, int& label) {
+void DataSet::get_one_by_idx(int idx, float* data, int64_t& label) {
     CHECK(data != nullptr) << "memory not allocated, implement error\n";
     string impth = img_paths[idx];
     Mat im = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);

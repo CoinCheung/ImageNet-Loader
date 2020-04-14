@@ -51,7 +51,7 @@ void DataLoader::init(string rootpth, string fname, vector<int> sz, bool train) 
 }
 
 
-void DataLoader::_get_batch(vector<float>* &data, vector<int>& size, vector<int>* &labels) {
+void DataLoader::_get_batch(vector<float>* &data, vector<int>& size, vector<int64_t>* &labels) {
     auto t1 = std::chrono::steady_clock::now();
     CHECK (!_is_end()) << "want more samples than n_samples, there can be some logical problem\n";
     int n_batch = batchsize;
@@ -59,7 +59,7 @@ void DataLoader::_get_batch(vector<float>* &data, vector<int>& size, vector<int>
 
     int single_size = width * height * 3;
     data = new vector<float>(n_batch * single_size);
-    labels = new vector<int>(n_batch);
+    labels = new vector<int64_t>(n_batch);
     int bs_thread = n_batch / num_workers + 1;
     auto thread_func = [&](int thread_idx) {
         for (int i{0}; i < bs_thread; ++i) {
