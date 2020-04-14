@@ -38,7 +38,7 @@ using std::unique_ptr;
 // done 2. use python to load a batch
 // done 3. use basic dataloader, and wipe it to python object
 // done 4. use multi-thread
-// 5. distributed
+// done 5. distributed, check shuffle/no-shuffle, dist/no-dist
 // 6. prefetch
 // 7. use thread pool
 // 8. see if pytorch release memories without capsule, use self memory pool

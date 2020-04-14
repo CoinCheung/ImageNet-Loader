@@ -31,12 +31,12 @@ import torch
 class CDataLoader(object):
 
     def __init__(self, imroot, annfile, batchsize, cropsize=(224, 224), shuffle=True, nchw=True, is_train=True, num_workers=4, drop_last=True):
-        self.shuffle = shuffle
-        self.dl = dataloader.CDataLoader(imroot, annfile, batchsize, cropsize, nchw, is_train, num_workers, drop_last)
+        #  self.shuffle = shuffle
+        self.dl = dataloader.CDataLoader(imroot, annfile, batchsize, cropsize, nchw, is_train, shuffle, num_workers, drop_last)
 
     def __iter__(self):
-        self.dl.restart()
-        if self.shuffle: self.dl.shuffle()
+        self.dl.start()
+        #  if self.shuffle: self.dl.shuffle()
         return self
 
     def __next__(self):
@@ -44,19 +44,30 @@ class CDataLoader(object):
             raise StopIteration
         return self.dl.get_batch()
 
+    def set_epoch(self, ep):
+        self.dl.set_epoch(ep)
+
+    def init_dist(self, rank=0, num_ranks=1):
+        self.dl.init_dist(rank, num_ranks)
+
+
 print('create loader')
 batchsize = 256
 num_workers = 4
 drop_last = False
 is_train = False
 shuffle = False
+rank = 0
+num_ranks = 2
 dl = CDataLoader("/data/zzy/imagenet/train/", "./train.txt", batchsize, [224, 224], shuffle, is_train=is_train, num_workers=num_workers, drop_last=drop_last)
+#  dl.init_dist(rank, num_ranks)
 
 print('start to iter data')
 for e in range(2):
+    dl.set_epoch(e + 1)
     for i, batch in enumerate(dl):
         print(i, ": ", batch[0].shape, ", ", batch[1].shape)
-        print(batch[1][:4])
+        print(batch[1][:10])
         #  if i == 5: break
 
 #  print(batch[0, 1, :4, :3])

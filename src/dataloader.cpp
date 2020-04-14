@@ -29,8 +29,8 @@ using cv::Mat;
 
 
 DataLoader::DataLoader(string rootpth, string fname, int bs,
-        vector<int> sz, bool nchw, bool train, int n_workers, 
-        bool drop_last):batchsize(bs), nchw(nchw),
+        vector<int> sz, bool nchw, bool train, bool shuffle, int n_workers, 
+        bool drop_last):batchsize(bs), nchw(nchw), shuffle(shuffle),
         num_workers(n_workers), drop_last(drop_last) {
     init(rootpth, fname, sz, train);
 }
@@ -39,12 +39,15 @@ void DataLoader::init(string rootpth, string fname, vector<int> sz, bool train) 
     height = sz[0];
     width = sz[1];
     pos = 0;
+    epoch = 0;
 
     // dataset.init(rootpth, fname, {height, width}, nchw);
     dataset = DataSet(rootpth, fname, {height, width}, train, nchw);
-    n_samples = dataset.get_n_samples();
-    indices.resize(n_samples);
-    std::iota(indices.begin(), indices.end(), 0);
+    n_all_samples = dataset.get_n_samples();
+    n_samples = n_all_samples;
+    all_indices.resize(n_samples);
+    std::iota(all_indices.begin(), all_indices.end(), 0);
+    indices = all_indices;
 }
 
 
@@ -94,34 +97,26 @@ void DataLoader::_get_batch(vector<float>* &data, vector<int>& size, vector<int>
     //     << std::chrono::duration<double, std::milli>(t3 - t2).count() << endl;
 }
 
-// void DataLoader::_get_batch(vector<float>* &data, vector<int>& size) {
-//     CHECK_LE(pos + batchsize, n_samples) << "want more samples than n_samples, there can be some logical problem\n";
-//     int single_size = width * height * 3;
-//     data = new vector<float>(batchsize * single_size);
-//     for (int b{0}; b < batchsize; ++b) {
-//         string impth = img_paths[pos];
-//         Mat im = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
-//         im = TransTrain(im, {height, width}, true);
-//         Mat2Mem(im, &((*data)[b * single_size]), nchw_layout);
-//         ++pos;
-//     }
-//     size.resize(4);
-//     if (nchw_layout) {
-//         size[0] = batchsize;size[1] = 3;
-//         size[2] = height;size[3] = width;
-//     } else {
-//         size[0] = batchsize;size[1] = height;
-//         size[2] = width;size[3] = 3;
-//     }
-// }
-
 
 void DataLoader::_shuffle() {
     std::shuffle(indices.begin(), indices.end(), grandom.engine);
 }
 
+void DataLoader::_start() {
+    pos = 0;
+    if (is_dist) {
+        _split_by_rank();
+    } else {
+        if (shuffle) {
+            std::shuffle(indices.begin(), indices.end(), grandom.engine);
+        }
+    }
+    ++epoch;
+}
+
 void DataLoader::_restart() {
     pos = 0;
+    epoch = 0;
 }
 
 bool DataLoader::_is_end() {
@@ -130,6 +125,32 @@ bool DataLoader::_is_end() {
         return true;
     } else return false;
 }
+
+void DataLoader::_set_epoch(int ep) {
+    epoch = ep;
+}
+
+void DataLoader::_init_dist(int rank, int num_ranks) {
+    is_dist = true;
+    this->rank = rank;
+    this->num_ranks = num_ranks;
+}
+
+void DataLoader::_split_by_rank() {
+    if (shuffle) {
+        randeng.seed(epoch);
+        std::shuffle(all_indices.begin(), all_indices.end(), randeng);
+    }
+    n_samples = static_cast<int>(n_all_samples / num_ranks) + 1;
+    indices.resize(n_samples);
+    int rank_pos = rank;
+    for (int i{0}; i < n_samples; ++i) {
+        indices[i] = all_indices[rank_pos];
+        rank_pos += num_ranks;
+        if (rank_pos >= n_all_samples) rank_pos = rank_pos % n_all_samples;
+    }
+}
+
 
 //
 // int main () {

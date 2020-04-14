@@ -39,12 +39,16 @@ class CDataLoader: public DataLoader {
     public:
         CDataLoader(string rootpth, string fname, 
                 int bs, vector<int> size, bool nchw=true, bool train=true, 
-                int n_workers=4, bool drop_last=true
-                ): DataLoader(rootpth, fname, bs, size, nchw, train, n_workers, drop_last) {}
+                bool shuffle=true, int n_workers=4, bool drop_last=true
+                ): DataLoader(rootpth, fname, bs, size, nchw, train, shuffle,
+                    n_workers, drop_last) {}
         py::tuple get_batch();
+        void start();
         void restart();
         void shuffle();
         bool is_end();
+        void set_epoch(int ep);
+        void init_dist(int rank, int num_ranks);
 };
 
 
@@ -68,11 +72,17 @@ py::tuple CDataLoader::get_batch() {
     return py::make_tuple(res_data, res_label);
 }
 
+void CDataLoader::start() {_start();}
+
 void CDataLoader::restart() {_restart();}
 
 void CDataLoader::shuffle() {_shuffle();}
 
 bool CDataLoader::is_end() {_is_end();}
+
+void CDataLoader::set_epoch(int ep) {_set_epoch(ep);}
+
+void CDataLoader::init_dist(int rank, int num_ranks) {_init_dist(rank, num_ranks);}
 
 
 PYBIND11_MODULE(dataloader, m) {
@@ -80,9 +90,12 @@ PYBIND11_MODULE(dataloader, m) {
     m.def("get_img_by_path", &get_img_by_path, "get single image float32 array");
 
     py::class_<CDataLoader>(m, "CDataLoader")
-        .def(py::init<string, string, int, vector<int>, bool, bool, int, bool>())
+        .def(py::init<string, string, int, vector<int>, bool, bool, bool, int, bool>())
         .def("get_batch", &CDataLoader::get_batch)
+        .def("start", &CDataLoader::start)
         .def("restart", &CDataLoader::restart)
         .def("shuffle", &CDataLoader::shuffle)
-        .def("is_end", &CDataLoader::is_end);
+        .def("is_end", &CDataLoader::is_end)
+        .def("set_epoch", &CDataLoader::set_epoch)
+        .def("init_dist", &CDataLoader::init_dist);
 }
