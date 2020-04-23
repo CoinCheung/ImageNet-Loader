@@ -42,7 +42,7 @@ class CDataLoader(object):
     def __next__(self):
         if self.dl.is_end():
             raise StopIteration
-        return self.dl.get_batch()
+        return self.dl.next_batch()
 
     def set_epoch(self, ep):
         self.dl.set_epoch(ep)
@@ -59,12 +59,13 @@ batchsize = 256
 num_workers = 4
 drop_last = False
 is_train = False
-shuffle = False
+shuffle = True
 rank = 0
-num_ranks = 2
+num_ranks = 1
 dl = CDataLoader("/data/zzy/imagenet/train/", "./train.txt", batchsize, [224, 224], shuffle, is_train=is_train, num_workers=num_workers, drop_last=drop_last)
-#  dl.init_dist(rank, num_ranks)
+dl.init_dist(rank, num_ranks)
 
+print('len of dl: ', len(dl))
 print('start to iter data')
 for e in range(2):
     dl.set_epoch(e + 1)
@@ -76,3 +77,6 @@ for e in range(2):
 #  print(batch[0, 1, :4, :3])
 #  print(batch[1, 1, :4, :3])
 print('ds len: ', len(dl))
+del dl
+for i in range(100000):
+    i = i*2

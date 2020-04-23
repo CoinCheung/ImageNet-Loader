@@ -1,6 +1,6 @@
 
 ## install dependencies
-apt install libgoogle-glog-dev libtiff-dev libgoogle-perftools-dev libzstd-dev libgtk2.0-dev libvcodec-dev libvformat-dev libjpeg-dev libjasper-dev libpcre3 ninja-build
+apt install libgoogle-glog-dev libtiff-dev libgoogle-perftools-dev libzstd-dev libgtk2.0-dev libavcodec-dev libvformat-dev libjpeg-dev libjasper-dev libpcre3 ninja-build
 
 ## change environment variables, delete miniconda items
 export PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
