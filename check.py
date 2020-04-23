@@ -51,7 +51,7 @@ class CDataLoader(object):
         self.dl.init_dist(rank, num_ranks)
 
     def __len__(self):
-        return self.dl.get_length()
+        return self.dl.get_n_batches()
 
 
 print('create loader')

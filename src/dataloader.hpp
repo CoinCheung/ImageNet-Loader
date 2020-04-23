@@ -76,7 +76,6 @@ class DataLoader {
         virtual ~DataLoader();
 
         void init(string rootpth, string fname, vector<int> sz, bool is_train);
-        void _get_batch(vector<float>* &data, vector<int>& size, vector<int64_t>* &labels);
         Batch _get_batch();
         void _shuffle();
         void _start();
