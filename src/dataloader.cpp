@@ -178,8 +178,8 @@ int64_t DataLoader::_get_ds_length() {
 }
 
 int64_t DataLoader::_get_n_batches() {
-    int64_t len = n_all_samples / batchsize;
-    if ((n_all_samples % batchsize != 0) && !drop_last) ++len;
+    int64_t len = n_samples / batchsize;
+    if ((n_samples % batchsize != 0) && !drop_last) ++len;
     return len;
 }
 

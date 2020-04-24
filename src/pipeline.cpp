@@ -106,7 +106,7 @@ Mat DataSet::TransTrain(Mat& im) {
     if (inplace) res = im;
     res = RandomResizedCrop(im, size);
     res = RandomHorizontalFlip(res, inplace);
-    res = ra(res);
+    // res = ra(res);
     res = Normalize(res, mean, std);
     return res;
 }
