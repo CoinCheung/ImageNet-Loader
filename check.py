@@ -35,8 +35,7 @@ class CDataLoader(object):
         self.dl = dataloader.CDataLoader(imroot, annfile, batchsize, cropsize, nchw, is_train, shuffle, num_workers, drop_last)
 
     def __iter__(self):
-        self.dl.start()
-        #  if self.shuffle: self.dl.shuffle()
+        self.dl.restart()
         return self
 
     def __next__(self):
@@ -53,6 +52,9 @@ class CDataLoader(object):
     def __len__(self):
         return self.dl.get_n_batches()
 
+    def start(self):
+        self.dl.start()
+
 
 print('create loader')
 batchsize = 256
@@ -61,9 +63,10 @@ drop_last = False
 is_train = False
 shuffle = True
 rank = 0
-num_ranks = 1
-dl = CDataLoader("/data/zzy/imagenet/train/", "./train.txt", batchsize, [224, 224], shuffle, is_train=is_train, num_workers=num_workers, drop_last=drop_last)
+num_ranks = 8
+dl = CDataLoader("/data/zzy/imagenet/train/", "grpc/train.txt", batchsize, [224, 224], shuffle, is_train=is_train, num_workers=num_workers, drop_last=drop_last)
 dl.init_dist(rank, num_ranks)
+dl.start()
 
 print('len of dl: ', len(dl))
 print('start to iter data')
@@ -71,12 +74,9 @@ for e in range(2):
     dl.set_epoch(e + 1)
     for i, batch in enumerate(dl):
         print(i, ": ", batch[0].shape, ", ", batch[1].shape)
-        print(batch[1][:10])
+        if i < 10:
+            print(batch[1][:10])
         #  if i == 5: break
 
-#  print(batch[0, 1, :4, :3])
-#  print(batch[1, 1, :4, :3])
 print('ds len: ', len(dl))
 del dl
-for i in range(100000):
-    i = i*2

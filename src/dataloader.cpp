@@ -55,8 +55,6 @@ void DataLoader::init(string rootpth, string fname, vector<int> sz, bool train) 
     all_indices.resize(n_samples);
     std::iota(all_indices.begin(), all_indices.end(), 0);
     indices = all_indices;
-    // start prefetcher as a sub-thread
-    start_prefetcher();
 }
 
 DataLoader::~DataLoader() {
@@ -133,13 +131,20 @@ void DataLoader::_start() {
             std::shuffle(indices.begin(), indices.end(), grandom.engine);
         }
     }
+    start_prefetcher();
     ++epoch;
-    prefetch_cond_var.notify_all();
 }
 
 void DataLoader::_restart() {
     pos = 0;
-    epoch = 0;
+    if (is_dist) {
+        _split_by_rank();
+    } else {
+        if (shuffle) {
+            std::shuffle(indices.begin(), indices.end(), grandom.engine);
+        }
+    }
+    prefetch_cond_var.notify_all();
 }
 
 bool DataLoader::_is_end() {
@@ -156,6 +161,8 @@ void DataLoader::_init_dist(int rank, int num_ranks) {
     is_dist = true;
     this->rank = rank;
     this->num_ranks = num_ranks;
+    this->n_samples = static_cast<int>(ceil((float)n_all_samples / num_ranks));
+    indices.resize(this->n_samples);
 }
 
 void DataLoader::_split_by_rank() {
@@ -163,8 +170,6 @@ void DataLoader::_split_by_rank() {
         randeng.seed(epoch);
         std::shuffle(all_indices.begin(), all_indices.end(), randeng);
     }
-    n_samples = static_cast<int>(ceil((float)n_all_samples / num_ranks));
-    indices.resize(n_samples);
     int rank_pos = rank;
     for (int i{0}; i < n_samples; ++i) {
         indices[i] = all_indices[rank_pos];
