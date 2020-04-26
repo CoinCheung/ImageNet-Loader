@@ -74,7 +74,7 @@ class CDataLoader: public DataLoader {
 
 // TODO: make convert to numpy a separate function
 py::tuple CDataLoader::next_batch() {
-    auto t1 = std::chrono::steady_clock::now();
+    // auto t1 = std::chrono::steady_clock::now();
     Batch spl = _next_batch();
     py::capsule cap_data = py::capsule(spl.data,
         [](void *p) {delete reinterpret_cast<vector<float>*>(p);});
@@ -82,7 +82,7 @@ py::tuple CDataLoader::next_batch() {
     py::capsule cap_lb = py::capsule(spl.labels,
         [](void *p) {delete reinterpret_cast<vector<int64_t>*>(p);});
     py::array res_label = py::array(spl.lsize, spl.labels->data(), cap_lb);
-    auto t2 = std::chrono::steady_clock::now();
+    // auto t2 = std::chrono::steady_clock::now();
     // cout << "after _get_batch_ called: "
     //     << std::chrono::duration<double, std::milli>(t2 - t1).count() << endl;
     // return res;
@@ -95,7 +95,7 @@ void CDataLoader::restart() {_restart();}
 
 void CDataLoader::shuffle() {_shuffle();}
 
-bool CDataLoader::is_end() {_is_end();}
+bool CDataLoader::is_end() {return _is_end();}
 
 void CDataLoader::set_epoch(int ep) {_set_epoch(ep);}
 

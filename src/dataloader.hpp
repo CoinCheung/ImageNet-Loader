@@ -13,6 +13,7 @@
 
 #include "pipeline.hpp"
 #include "blocking_queue.hpp"
+#include "thread_pool.hpp"
 
 
 using std::vector;
@@ -22,7 +23,6 @@ using std::condition_variable;
 using std::array;
 
 
-// TODO: rename as batch
 class Batch {
     public: 
         vector<float> *data{nullptr};
@@ -66,7 +66,7 @@ class DataLoader {
         condition_variable prefetch_cond_var;
         mutex prefetch_mtx;
 
-
+        ThreadPool thread_pool;
         DataSet dataset;
 
         DataLoader() {}

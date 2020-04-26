@@ -85,7 +85,6 @@ void Mat2Vec (Mat &im, vector<float>* &res, vector<int>& size, bool CHW) {
 
 
 // member function of TransformTrain
-// TODO: write it as register ops
 DataSet::DataSet(string rootpth, string fname, array<int, 2> size, bool is_train, bool nchw, int ra_n, int ra_m, bool inplace): size(size), inplace(inplace), is_train(is_train), nchw(nchw) {
     parse_annos(rootpth, fname);
     ra = RandAug(ra_n, ra_m);

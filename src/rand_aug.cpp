@@ -54,7 +54,7 @@ void RandAug::Register_ops() {
 // TODO: 
 // done 1. add parse magnitude logic
 // dicard for low efficiency 2. try to use std::bind and std::function
-// 3. add operations of implement translateX and translateY
+// done 3. add operations of implement translateX and translateY
 Mat RandAug::operator()(Mat& im) {
     vector<int64_t> op_idx = grandom.randint(0, num_ops, N);
     // std::copy(op_idx.begin(), op_idx.end(), std::ostream_iterator<int64_t>(std::cout, ", "));

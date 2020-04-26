@@ -5,6 +5,8 @@ print('after')
 import numpy as np
 import torch
 
+# 1. pool-4t: 9m
+# 2. async-4t: 9m
 
 #  print(dataloader.get_img_by_path('./example.png').shape)
 #  print('get im')
@@ -58,7 +60,7 @@ class CDataLoader(object):
 
 print('create loader')
 batchsize = 256
-num_workers = 4
+num_workers = 1
 drop_last = False
 is_train = False
 shuffle = True

@@ -27,14 +27,14 @@ public:
     ThreadPool(uint32_t capacity=std::thread::hardware_concurrency(), 
             uint32_t n_threads=std::thread::hardware_concurrency()
             ): capacity(capacity), n_threads(n_threads) {
-        init();
+        init(capacity, n_threads);
     }
 
     ~ThreadPool() noexcept {
         shutdown();
     }
 
-    void init() {
+    void init(uint32_t capacity, uint32_t n_threads) {
         CHECK_GT(capacity, 0) << "task queue capacity should be greater than 0";
         CHECK_GT(n_threads, 0) << "thread pool capacity should be greater than 0";
         for (int i{0}; i < n_threads; ++i) {
@@ -43,11 +43,12 @@ public:
                 while (!this->stop) {
                     {
                         std::unique_lock<std::mutex> lock(this->q_mutex);
-                        task_q_empty.wait(lock, [&] {return this->stop | !task_q.empty();});
+                        task_q_empty.wait(lock, [&] {return this->stop || !task_q.empty();});
                         if (this->stop) break;
                         task = this->task_q.front();
                         this->task_q.pop();
                         task_q_full.notify_one();
+                        // task_q_full.notify_all();
                     }
                     // auto id = std::this_thread::get_id();
                     task();
@@ -74,11 +75,12 @@ public:
         auto task_ptr = std::make_shared<std::packaged_task<res_type()>>(func);
         {
             std::unique_lock<std::mutex> lock(q_mutex);
-            task_q_full.wait(lock, [&] {return this->stop | task_q.size() <= capacity;});
+            task_q_full.wait(lock, [&] {return this->stop || task_q.size() <= capacity;});
             CHECK (this->stop == false) << "should not add task to stopped queue\n";
             task_q.emplace([task_ptr]{(*task_ptr)();});
         }
         task_q_empty.notify_one();
+        // task_q_empty.notify_all();
         return task_ptr->get_future();
     }
 
@@ -92,6 +94,5 @@ private:
     uint32_t capacity;
     uint32_t n_threads;
 };
-
 
 #endif

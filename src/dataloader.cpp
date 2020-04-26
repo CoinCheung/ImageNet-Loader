@@ -55,6 +55,8 @@ void DataLoader::init(string rootpth, string fname, vector<int> sz, bool train) 
     all_indices.resize(n_samples);
     std::iota(all_indices.begin(), all_indices.end(), 0);
     indices = all_indices;
+
+    thread_pool.init(1024, num_workers);
 }
 
 DataLoader::~DataLoader() {
@@ -62,7 +64,7 @@ DataLoader::~DataLoader() {
 }
 
 Batch DataLoader::_get_batch() {
-    auto t1 = std::chrono::steady_clock::now();
+    // auto t1 = std::chrono::steady_clock::now();
     CHECK (!pos_end()) << "want more samples than n_samples, there can be some logical problem\n";
 
     Batch spl;
@@ -85,16 +87,18 @@ Batch DataLoader::_get_batch() {
         }
     };
 
-    auto t2 = std::chrono::steady_clock::now();
+    // auto t2 = std::chrono::steady_clock::now();
     vector<std::future<void>> tpool(num_workers);
+    // vector<std::future<void>> tpool;
     for (int i{0}; i < num_workers; ++i) {
-        tpool[i] = std::async(std::launch::async, thread_func, i);
+        // tpool[i] = std::async(std::launch::async, thread_func, i);
+        tpool[i] = std::move(thread_pool.submit(thread_func, i));
     }
     for (int i{0}; i < num_workers; ++i) {
         tpool[i].get();
     }
     pos += n_batch;
-    auto t3 = std::chrono::steady_clock::now();
+    // auto t3 = std::chrono::steady_clock::now();
 
     vector<int> dsize;
     if (nchw) {
@@ -104,7 +108,7 @@ Batch DataLoader::_get_batch() {
         dsize = {n_batch, height, width, 3};
     }
     vector<int> lsize{n_batch};
-    auto t4 = std::chrono::steady_clock::now();
+    // auto t4 = std::chrono::steady_clock::now();
     //
     // cout << "prepare thread_func and memory: "
     //     << std::chrono::duration<double, std::milli>(t2 - t1).count() << endl;

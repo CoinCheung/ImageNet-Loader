@@ -2,7 +2,13 @@
 cmake_minimum_required (VERSION 2.8)
 project (randaug_cpp)
 
-set(CMAKE_CXX_FLAGS "-std=c++11 -O2")
+
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif ()
+set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 
 ## external lib paths
 set (OpenCV_DIR /usr/local/lib/cmake/opencv4)
