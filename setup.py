@@ -29,13 +29,19 @@ class build_ext(build_ext_org):
         self.spawn(['cmake', '..'])
         self.spawn(['make', '-j4'])
         os.chdir(cwd)
+        shutil.rmtree(build_dir)
 
+
+# TODO: install_requires, python_requires
 setup(
-    name='dataloader',
+    name='cdataloader', # named used to install package egg/pip
     version='0.1',
-    packages=['coin'],
-    ext_modules=[CMakeExtension()],
+    packages=['cdataloader'], # names to import in python
+    ext_modules=[CMakeExtension('_cdataloader')], # whatever, no matter
     cmdclass={
         'build_ext': build_ext,
     }
+    install_requires=['numpy >= 1.17.0'],
+    python_requires='>=3.6',
+
 )

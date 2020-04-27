@@ -34,4 +34,4 @@ pybind11_add_module(dataloader SHARED wrapper.cpp)
 target_link_libraries(dataloader ${LIGHTSTEP_LINK_LIBRARY})
 set_target_properties(dataloader
     PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
+    LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/cdataloader)

@@ -35,4 +35,7 @@
 *.so
 __pycache__
 build/
+todo_list.txt
+train.txt
+
 

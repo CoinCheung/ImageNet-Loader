@@ -1,4 +1,7 @@
 
+Note: this is just a simple dataloader for classification, 
+
+
 ## install dependencies
 apt install libgoogle-glog-dev libtiff-dev libgoogle-perftools-dev libzstd-dev libgtk2.0-dev libavcodec-dev libvformat-dev libjpeg-dev libjasper-dev libpcre3 ninja-build
 

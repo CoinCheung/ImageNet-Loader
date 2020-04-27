@@ -1,3 +1,0 @@
-
-1. add pca-noise
-2. color-jitter
