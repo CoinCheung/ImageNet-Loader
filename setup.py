@@ -34,10 +34,13 @@ class build_ext(build_ext_org):
 
     def build_opencv(self,):
         os.chdir('third_party/opencv')
+        cwd = os.getcwd()
         os.makedirs('build')
         os.chdir('build')
         self.spawn(['cmake', '..', '-DCMAKE_BUILD_TYPE=RELEASE', '-DOPENCV_GENERATE_PKGCONFIG=ON', '-DWITH_TBB=ON', '-DBUILD_TBB=ON', '-GNinja'])
         self.spawn(['ninja', 'install'])
+        os.chdir(cwd)
+        shutil.rmtree('build')
 
 
 # TODO: install_requires, python_requires
@@ -48,7 +51,7 @@ setup(
     ext_modules=[CMakeExtension('_cdataloader')], # whatever, no matter
     cmdclass={
         'build_ext': build_ext,
-    }
+    },
     install_requires=['numpy >= 1.17.0'],
     python_requires='>=3.6',
 
