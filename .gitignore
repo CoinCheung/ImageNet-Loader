@@ -36,6 +36,6 @@
 __pycache__
 build/
 todo_list.txt
-train.txt
+# train.txt
 
 
