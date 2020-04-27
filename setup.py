@@ -16,6 +16,7 @@ class CMakeExtension(Extension):
 class build_ext(build_ext_org):
 
     def run(self):
+        self.build_opencv()
         for ext in self.extensions:
             self.build_cmake(ext)
             super().run()
@@ -30,6 +31,13 @@ class build_ext(build_ext_org):
         self.spawn(['make', '-j4'])
         os.chdir(cwd)
         shutil.rmtree(build_dir)
+
+    def build_opencv(self,):
+        os.chdir('third_party/opencv')
+        os.makedirs('build')
+        os.chdir('build')
+        self.spawn(['cmake', '..', '-DCMAKE_BUILD_TYPE=RELEASE', '-DOPENCV_GENERATE_PKGCONFIG=ON', '-DWITH_TBB=ON', '-DBUILD_TBB=ON', '-GNinja'])
+        self.spawn(['ninja', 'install'])
 
 
 # TODO: install_requires, python_requires
