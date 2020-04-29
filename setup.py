@@ -33,6 +33,7 @@ class build_ext(build_ext_org):
         shutil.rmtree(build_dir)
 
     def build_opencv(self,):
+        rootpth = os.getcwd()
         os.chdir('third_party/opencv')
         cwd = os.getcwd()
         os.makedirs('build')
@@ -41,9 +42,9 @@ class build_ext(build_ext_org):
         self.spawn(['ninja', 'install'])
         os.chdir(cwd)
         shutil.rmtree('build')
+        os.chdir(rootpth)
 
 
-# TODO: install_requires, python_requires
 setup(
     name='cdataloader', # named used to install package egg/pip
     version='0.1',

@@ -17,9 +17,3 @@ export PATH=/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bi
 git clone --depth 1 --recursive https://github.com/pybind/pybind11.git third_party/pybind11
 git clone --depth 1 --recursive https://github.com/opencv/opencv.git third_party/opencv
 
-<!-- # compile opencv from source -->
-<!-- cd third_party/opencv -->
-<!-- mkdir -p build -->
-<!-- cd build -->
-<!-- cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DOPENCV_GENERATE_PKGCONFIG=ON -DWITH_TBB=ON -DBUILD_TBB=ON -GNinja -->
-<!-- ninja install -->
