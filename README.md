@@ -12,39 +12,39 @@ Just install required packages, and compile.
 
 **1. dependencies**   
 These are mainly dependencies for compiling opencv from source:   
-    ```
-        $ apt install libgoogle-glog-dev libtiff-dev libgoogle-perftools-dev libzstd-dev libgtk2.0-dev libavcodec-dev libvformat-dev libjpeg-dev libjasper-dev libpcre3 ninja-build
-    ```   
+```
+    $ apt install libgoogle-glog-dev libtiff-dev libgoogle-perftools-dev libzstd-dev libgtk2.0-dev libavcodec-dev libvformat-dev libjpeg-dev libjasper-dev libpcre3 ninja-build
+```   
 Also, Please use newer version cmake(I use [cmake3.17](https://github.com/Kitware/CMake/releases/download/v3.17.1/cmake-3.17.1-Linux-x86_64.tar.gz))
 
 **2. build**   
-There are two methods to do this:  
+There are two methods to do build:  
 the first method is building with setuptools   
-    ```
-        $ git clone --depth 1 https://github.com/CoinCheung/ImageNet-Loader.git
-        $ cd ImageNet-Loader && git submodule init && git submodule update --depth 1
-        $ python setup.py develop
-    ```
+```
+    $ git clone --depth 1 https://github.com/CoinCheung/ImageNet-Loader.git  
+    $ cd ImageNet-Loader && git submodule init && git submodule update --depth 1  
+    $ python setup.py develop  
+```
 
 the second method is build step by step  
 build opencv:   
-    ```
-        $ cd third_party/opencv
-        $ mkdir -p build && cd build
-        $ cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DOPENCV_GENERATE_PKGCONFIG=ON -DWITH_TBB=ON -DBUILD_TBB=ON -GNinja
-        $ ninja install
-    ```   
+```
+    $ cd third_party/opencv  
+    $ mkdir -p build && cd build  
+    $ cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DOPENCV_GENERATE_PKGCONFIG=ON -DWITH_TBB=ON -DBUILD_TBB=ON -GNinja  
+    $ ninja install  
+```   
 build the dataloader:    
-    ```
-        $ cd /path/to/ImageNet-Loader
-        $ mkdir -p build && cd build
-        $ cmake .. -GNinja
-        $ ninja
-    ```  
+```
+    $ cd /path/to/ImageNet-Loader  
+    $ mkdir -p build && cd build  
+    $ cmake .. -GNinja  
+    $ ninja  
+```  
 add to `PYTHONPATH`:    
-    ```
-        export PYTHONPATH=/path/to/ImageNet-Loader:$PYTHONPATH
-    ```  
+```
+    export PYTHONPATH=/path/to/ImageNet-Loader:$PYTHONPATH
+```  
 
 ### usage
 There is a simple usage example in [demo.py](demo.py), just configure the settings and use it as normal python iterator.

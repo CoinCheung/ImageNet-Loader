@@ -43,15 +43,15 @@ list(APPEND SUB_LIBRARY comm)
 aux_source_directory (. SRC_CPP)
 message(${SRC_CPP})
 # set (SRC_CPP
-#     ./main.cpp
+#     ./run.cpp
 #     ./transforms.cpp
 #     ./random.cpp
 #     ./rand_aug.cpp
 #     ./server.cpp
 # )
 
-add_executable (main ${SRC_CPP})
-target_link_libraries(main
+add_executable (run ${SRC_CPP})
+target_link_libraries(run
     ${SUB_LIBRARY}
     ${LIGHTSTEP_LINK_LIBRARY}
 )
