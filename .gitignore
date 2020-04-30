@@ -38,7 +38,7 @@ build/
 todo_list.txt
 example.png
 INSTALL.md
-main.cpp
+./main.cpp
 # train.txt
 
 
