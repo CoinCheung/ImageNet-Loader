@@ -100,10 +100,12 @@ Mat ResizeCenterCrop(Mat &im, array<int, 2> size) {
     int th{size[0]}, tw{size[1]};
     int w, h;
     if (W < H) {
-        w = tw + 32;
+        // w = tw + 32;
+        w = static_cast<int>(tw * (256. / 224.));
         h = static_cast<int>(w * H / W);
     } else {
-        h = th + 32;
+        // h = th + 32;
+        h = static_cast<int>(th * (256. / 224.));
         w = static_cast<int>(h * W / H);
     }
     Mat res;
@@ -113,12 +115,123 @@ Mat ResizeCenterCrop(Mat &im, array<int, 2> size) {
     return res;
 }
 
-Mat Normalize(Mat &im, array<double, 3> mean, array<double, 3> std) {
-    Mat res;
-    im.convertTo(res, CV_32FC3, 1. / 255);
-    cv::subtract(res, cv::Scalar(mean[0], mean[1], mean[2]), res);
-    cv::divide(res, cv::Scalar(std[0], std[1], std[2]), res);
 
+Mat Normalize(Mat &im, array<double, 3> mean, array<double, 3> std) {
+    Mat res = im;
+    // im.convertTo(res, CV_32FC3, 1. / 255);
+    // cv::subtract(res, cv::Scalar(mean[0], mean[1], mean[2]), res);
+
+    // cv::subtract(im, cv::Scalar(mean[0], mean[1], mean[2]), res);
+    // cv::divide(res, cv::Scalar(std[0], std[1], std[2]), res);
+
+    array<float, 3> m, s;
+    m[0] = static_cast<float>(mean[0]);
+    m[1] = static_cast<float>(mean[1]);
+    m[2] = static_cast<float>(mean[2]);
+
+    s[0] = static_cast<float>(1. / std[0]);
+    s[1] = static_cast<float>(1. / std[1]);
+    s[2] = static_cast<float>(1. / std[2]);
+
+    res.forEach<cv::Vec3f>([&] (cv::Vec3f &pix, const int* pos) {
+        pix[0] = (pix[0] - m[0]) * s[0];
+        pix[1] = (pix[1] - m[1]) * s[1];
+        pix[2] = (pix[2] - m[2]) * s[2];
+    });
+
+    return res;
+}
+
+
+void Normalize(Mat &im, array<float, 3> mean, array<float, 3> std, float* p_res, bool pca_noise, double pca_std, bool nchw) {
+    /* merge 1/255, pca-noise, mean/var and layout change operations together, so see if this can be faster */
+
+    // for pca noise
+    vector<float> rgb(3, 0);
+    if (pca_noise) {
+        vector<float> alpha(3);
+        std::generate(alpha.begin(), alpha.end(), [&](){
+                return static_cast<float>(grandom.normal(0., pca_std));});
+        vector<vector<float>> eig_vec{
+            {-0.5675f, 0.7192f, 0.4009f},
+            {-0.5808f, -0.0045f, -0.8140f}, 
+            {-0.5836f, -0.6948f, 0.4203f}};
+        vector<float> eig_val{0.2175f, 0.0188f, 0.0045f};
+        for (int i{0}; i < 3; ++i) {
+            rgb[0] += eig_vec[0][i] * alpha[i] * eig_val[i];
+            rgb[1] += eig_vec[1][i] * alpha[i] * eig_val[i];
+            rgb[2] += eig_vec[2][i] * alpha[i] * eig_val[i];
+        }
+    }
+
+    // for mean/var
+    for (int i{0}; i < 3; ++ i) {
+        std[i] = 1.f / std[i];
+    }
+
+    float scale = static_cast<float>(1. / 255.);
+    im.forEach<cv::Vec3b>([&] (cv::Vec3b &pix, const int* pos) {
+        for (int i{0}; i < 3; ++i) {
+            float tmp = static_cast<float>(pix[i]) * scale; 
+            tmp += rgb[2 - i];
+            tmp = (tmp - mean[i]) * std[i];
+            int offset;
+            if (nchw) {
+                offset = i * im.rows * im.cols + pos[0] * im.cols + pos[1];
+            } else {
+                offset = pos[0] * im.cols * 3 + pos[1] * 3 + i;
+            }
+            p_res[offset] = tmp;
+        }
+    });
+}
+
+Mat AddPCANoise(Mat &im, double std, bool inplace) {
+    vector<float> alpha(3);
+    std::generate(alpha.begin(), alpha.end(), [&](){
+            return static_cast<float>(grandom.normal(0., std));});
+    vector<vector<float>> eig_vec{
+        {-0.5675f, 0.7192f, 0.4009f},
+        {-0.5808f, -0.0045f, -0.8140f}, 
+        {-0.5836f, -0.6948f, 0.4203f}};
+    vector<float> eig_val{0.2175f, 0.0188f, 0.0045f};
+    vector<float> rgb(3, 0);
+    for (int i{0}; i < 3; ++i) {
+        rgb[0] += eig_vec[0][i] * alpha[i] * eig_val[i];
+        rgb[1] += eig_vec[1][i] * alpha[i] * eig_val[i];
+        rgb[2] += eig_vec[2][i] * alpha[i] * eig_val[i];
+    }
+
+    Mat res;
+    if (inplace) res = im; else res = im.clone();
+    res.forEach<cv::Vec3b>([&] (cv::Vec3b &pix, const int* pos) {
+        pix[0] += rgb[2];
+        pix[1] += rgb[1];
+        pix[2] += rgb[0];
+    });
+    return im;
+}
+
+
+Mat ColorJitter (
+        Mat &im, double brightness, double contrast, 
+        double saturation, bool inplace) {
+    brightness = grandom.rand(std::max(0., 1. - brightness), 1. + brightness);
+    contrast = grandom.rand(std::max(0., 1. - contrast), 1. + contrast);
+    saturation = grandom.rand(std::max(0., 1. - saturation), 1. + saturation);
+
+    Mat res;
+    vector<int> order{0, 1, 2};
+    std::shuffle(order.begin(), order.end(), grandom.engine);
+    for (int i{0}; i < 3; ++i) {
+        if (order[i] == 0) {
+            res = BrightnessFunc(im, brightness, inplace);
+        } else if (order[i] == 1) {
+            res = ContrastFunc(res, contrast, inplace);
+        } else if (order[i] == 2) {
+            res = ColorFunc(res, saturation, inplace);
+        }
+    }
     return res;
 }
 
@@ -482,7 +595,7 @@ Mat ContrastFunc(Mat &im, float factor, bool inplace) {
     array<uint8_t, 256> table;
     float lo{0}, hi{255};
     for (int i{0}; i < 256; ++i) {
-        float value = (i - mean) * factor + mean;
+        float value = (static_cast<float>(i) - mean) * factor + mean;
         value = std::max(lo, std::min(value, hi));
         table[i] = static_cast<uint8_t>(value);
     }

@@ -22,7 +22,7 @@ There are two methods to do build:
 the first method is building with setuptools   
 ```
     $ git clone --depth 1 https://github.com/CoinCheung/ImageNet-Loader.git  
-    $ cd ImageNet-Loader && git submodule init && git submodule update --depth 1  
+    $ cd ImageNet-Loader && git submodule init && git submodule update   
     $ python setup.py develop  
 ```
 

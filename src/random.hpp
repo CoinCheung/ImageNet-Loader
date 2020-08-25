@@ -16,10 +16,12 @@ class Random {
         Random();
         Random(int seed);
 
+        // method
         void set_seed(int seed);
         double rand();
         double rand(double from, double to);
         int64_t randint(int64_t from, int64_t to);
+        double normal(double mean, double std);
         vector<int64_t> randint(int64_t from, int64_t to, int64_t num, bool non_repeat=false);
 
 };

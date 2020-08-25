@@ -1,5 +1,5 @@
 
-from cdataloader import CDataLoader
+from cdataloader import CDataLoaderNp
 import cdataloader
 import numpy as np
 import torch
@@ -10,14 +10,14 @@ cropsize = [224, 224]
 batchsize = 256
 num_workers = 4
 drop_last = False
-is_train = False
 shuffle = True
 rank = 0
 num_ranks = 8
-img_root = "/data/imagenet/train/"
+img_root = "/data/zzy/imagenet/train/"
 anno_file = "grpc/train.txt"
-dl = CDataLoader(img_root, anno_file, batchsize, cropsize, shuffle,
-        is_train=is_train, num_workers=num_workers, drop_last=drop_last)
+dl = CDataLoaderNp(img_root, anno_file, batchsize, cropsize, shuffle,
+        num_workers=num_workers, drop_last=drop_last)
+dl.train()
 dl.init_dist(rank, num_ranks) # remove this if it is not distributed training mode
 dl.start()
 
@@ -30,4 +30,5 @@ for e in range(num_epochs):
         ims = torch.from_numpy(ims).cuda()
         lbs = torch.from_numpy(lbs).cuda()
         ...
+        print(ims.size())
 

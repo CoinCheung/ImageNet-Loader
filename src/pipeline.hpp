@@ -26,13 +26,14 @@ class DataSet {
         vector<int64_t> labels;
         int n_samples;
         array<int, 2> size;
-        bool inplace;
-        bool is_train;
-        bool nchw;
+        bool inplace{true};
+        bool is_train{true};
+        bool nchw{true};
         RandAug ra;
+        bool use_ra{false};
 
-        DataSet(string rootpth, string fname, array<int, 2> size={224, 224}, bool train=true, bool nchw=true, int ra_n=2, int ra_m=9, bool inplace=true); 
-        DataSet() {}
+        DataSet(string rootpth, string fname, array<int, 2> size={224, 224}, bool nchw=true, bool inplace=true); 
+        DataSet() {set_default_states();}
 
         // void init(string rootpth, string fname, array<int, 2> size={224, 224}, bool nchw=true, int ra_n=2, int ra_m=9, bool inplace=true);
         void parse_annos(string imroot, string annfile);
@@ -41,6 +42,11 @@ class DataSet {
         void get_one_by_idx(int idx, float* data, int64_t& lb);
         void Mat2Mem (Mat &im, float* res);
         int get_n_samples();
+        void set_default_states();
+
+        void _train();
+        void _eval();
+        void _set_rand_aug(int ra_n=2, int ra_m=9);
 };
 
 

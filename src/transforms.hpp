@@ -21,6 +21,14 @@ Mat RandomResizedCrop(Mat &im, array<int, 2> size,
         array<double, 2> ratio={3./4., 4./3.});
 Mat ResizeCenterCrop(Mat &im, array<int, 2> size);
 Mat Normalize(Mat &im, array<double, 3> mean, array<double, 3> std);
+Mat AddPCANoise(Mat &im, double std, bool inplace=true);
+Mat ColorJitter(
+        Mat &im, double brightness, double contrast, 
+        double saturation, bool inplace=true);
+void Normalize(
+        Mat &im, array<float, 3> mean, array<float, 3> std,
+        float* p_res, bool pca_noise=false, double pca_std=0.1f,
+        bool nchw=true);
 Mat HWC2CHW (Mat &im);
 // vector<float> Mat2Vec (Mat &im);
 

@@ -35,21 +35,25 @@ py::array get_img_by_path(py::str impth) {
     return res;
 }
 
-class CDataLoader: public DataLoader {
+class CDataLoaderNp {
     public:
-        CDataLoader(string rootpth, string fname, 
-                int bs, vector<int> size, bool nchw=true, bool train=true, 
+        CDataLoaderNp(string rootpth, string fname, 
+                int bs, vector<int> size, bool nchw=true, 
                 bool shuffle=true, int n_workers=4, bool drop_last=true
-                ): DataLoader(rootpth, fname, bs, size, nchw, train, shuffle,
-                    n_workers, drop_last) {}
+                ): dl(rootpth, fname, bs, size, nchw, shuffle, n_workers, drop_last) {}
         py::tuple next_batch();
-        void start();
-        void restart();
-        void shuffle();
-        bool is_end();
-        void set_epoch(int ep);
-        void init_dist(int rank, int num_ranks);
-        int64_t get_n_batches();
+        void start() {dl._start();}
+        void restart() {dl._restart();}
+        void shuffle() {dl._shuffle();}
+        bool is_end() {return dl._is_end();}
+        void set_epoch(int ep) {dl._set_epoch(ep);}
+        void init_dist(int rank, int num_ranks) {dl._init_dist(rank, num_ranks);}
+        int64_t get_num_batches() {return dl._get_num_batches();}
+        void train() {dl.dataset._train();}
+        void eval() {dl.dataset._eval();}
+        void set_rand_aug(int N, int M) {dl.dataset._set_rand_aug(N, M);}
+
+        DataLoaderNp dl;
 };
 
 // py::tuple CDataLoader::get_batch() {
@@ -73,9 +77,9 @@ class CDataLoader: public DataLoader {
 // }
 
 // TODO: make convert to numpy a separate function
-py::tuple CDataLoader::next_batch() {
+py::tuple CDataLoaderNp::next_batch() {
     // auto t1 = std::chrono::steady_clock::now();
-    Batch spl = _next_batch();
+    Batch spl = dl._next_batch();
     py::capsule cap_data = py::capsule(spl.data,
         [](void *p) {delete reinterpret_cast<vector<float>*>(p);});
     py::array res_data = py::array(spl.dsize, spl.data->data(), cap_data);
@@ -89,33 +93,22 @@ py::tuple CDataLoader::next_batch() {
     return py::make_tuple(res_data, res_label);
 }
 
-void CDataLoader::start() {_start();}
-
-void CDataLoader::restart() {_restart();}
-
-void CDataLoader::shuffle() {_shuffle();}
-
-bool CDataLoader::is_end() {return _is_end();}
-
-void CDataLoader::set_epoch(int ep) {_set_epoch(ep);}
-
-void CDataLoader::init_dist(int rank, int num_ranks) {_init_dist(rank, num_ranks);}
-
-int64_t CDataLoader::get_n_batches() {return _get_n_batches();}
-
 
 PYBIND11_MODULE(dataloader, m) {
     m.doc() = "load image with c++";
     m.def("get_img_by_path", &get_img_by_path, "get single image float32 array");
 
-    py::class_<CDataLoader>(m, "CDataLoader")
-        .def(py::init<string, string, int, vector<int>, bool, bool, bool, int, bool>())
-        .def("next_batch", &CDataLoader::next_batch)
-        .def("start", &CDataLoader::start)
-        .def("restart", &CDataLoader::restart)
-        .def("shuffle", &CDataLoader::shuffle)
-        .def("is_end", &CDataLoader::is_end)
-        .def("set_epoch", &CDataLoader::set_epoch)
-        .def("init_dist", &CDataLoader::init_dist)
-        .def("get_n_batches", &CDataLoader::get_n_batches);
+    py::class_<CDataLoaderNp>(m, "CDataLoaderNp")
+        .def(py::init<string, string, int, vector<int>, bool, bool, int, bool>())
+        .def("next_batch", &CDataLoaderNp::next_batch)
+        .def("start", &CDataLoaderNp::start)
+        .def("restart", &CDataLoaderNp::restart)
+        .def("shuffle", &CDataLoaderNp::shuffle)
+        .def("is_end", &CDataLoaderNp::is_end)
+        .def("set_epoch", &CDataLoaderNp::set_epoch)
+        .def("init_dist", &CDataLoaderNp::init_dist)
+        .def("get_num_batches", &CDataLoaderNp::get_num_batches)
+        .def("train", &CDataLoaderNp::train)
+        .def("eval", &CDataLoaderNp::eval)
+        .def("set_rand_aug", &CDataLoaderNp::set_rand_aug);
 }

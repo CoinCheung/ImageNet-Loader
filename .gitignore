@@ -34,11 +34,31 @@
 ## COIN
 *.so
 __pycache__
+*.py[cod]
+*$py.class
 build/
 todo_list.txt
 example.png
 INSTALL.md
 main.cpp
 # train.txt
+# Distribution / packaging
+.Python
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt

@@ -85,9 +85,9 @@ void Mat2Vec (Mat &im, vector<float>* &res, vector<int>& size, bool CHW) {
 
 
 // member function of TransformTrain
-DataSet::DataSet(string rootpth, string fname, array<int, 2> size, bool is_train, bool nchw, int ra_n, int ra_m, bool inplace): size(size), inplace(inplace), is_train(is_train), nchw(nchw) {
+DataSet::DataSet(string rootpth, string fname, array<int, 2> size, bool nchw, bool inplace): size(size), inplace(inplace), nchw(nchw) {
+    set_default_states();
     parse_annos(rootpth, fname);
-    ra = RandAug(ra_n, ra_m);
 }
 
 // void DataSet::init(string rootpth, string fname, array<int, 2> sz, bool use_nchw, int ra_n, int ra_m, bool use_inplace) {
@@ -100,22 +100,27 @@ DataSet::DataSet(string rootpth, string fname, array<int, 2> size, bool is_train
 
 
 Mat DataSet::TransTrain(Mat& im) {
-    array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
     Mat res;
     if (inplace) res = im;
     res = RandomResizedCrop(im, size);
     res = RandomHorizontalFlip(res, inplace);
-    res = ra(res);
-    res = Normalize(res, mean, std);
+    if (use_ra) res = ra(res);
+
+    // res.convertTo(res, CV_32FC3, 1. / 255.);
+    // // res = AddPCANoise(res, 0.1);
+    // array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
+    // res = Normalize(res, mean, std);
     return res;
 }
 
 Mat DataSet::TransVal(Mat& im) {
-    array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
     Mat res;
     if (inplace) res = im;
     res = ResizeCenterCrop(im, size);
-    res = Normalize(res, mean, std);
+
+    // res.convertTo(res, CV_32FC3, 1. / 255);
+    // array<double, 3> mean{0.485, 0.456, 0.406}, std{0.229, 0.224, 0.225};
+    // res = Normalize(res, mean, std);
     return res;
 }
 
@@ -124,12 +129,14 @@ void DataSet::get_one_by_idx(int idx, float* data, int64_t& label) {
     CHECK(data != nullptr) << "memory not allocated, implement error\n";
     string impth = img_paths[idx];
     Mat im = cv::imread(impth, cv::ImreadModes::IMREAD_COLOR);
+    CHECK(!im.empty()) << "image " << impth << "does not exists\n";
     if (is_train) {
         im = TransTrain(im);
     } else {
         im = TransVal(im);
     }
-    Mat2Mem(im, data);
+    Normalize(im, {0.485f, 0.456f, 0.406f}, {0.229f, 0.224f, 0.225f}, data, is_train, 0, true);
+    // Mat2Mem(im, data);
     label = labels[idx];
 }
 
@@ -194,4 +201,27 @@ void DataSet::parse_annos(string imroot, string annfile) {
 
 int DataSet::get_n_samples() {
     return n_samples;
+}
+
+
+void DataSet::_train() {
+    is_train = true;
+}
+
+void DataSet::_eval() {
+    is_train = false;
+}
+
+// TODO: maybe print some message for different train/val mode
+void DataSet::_set_rand_aug(int ra_n, int ra_m) {
+    use_ra = true;
+    ra = RandAug(ra_n, ra_m);
+}
+
+
+void DataSet::set_default_states() {
+    inplace = true;
+    is_train = true;
+    nchw = true;
+    use_ra = false;
 }

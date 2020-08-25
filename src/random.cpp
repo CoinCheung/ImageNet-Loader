@@ -39,6 +39,12 @@ double Random::rand(double from, double to) {
 }
 
 
+double Random::normal(double mean, double std) {
+    std::normal_distribution<double> dist(mean, std);
+    return dist(engine);
+}
+
+
 vector<int64_t> Random::randint(int64_t from, int64_t to, int64_t num, bool non_repeat) {
     CHECK_LE(from,  to) << "random range error, from should less than to\n";
     vector<int64_t> res(num);

@@ -16,7 +16,7 @@ class CMakeExtension(Extension):
 class build_ext(build_ext_org):
 
     def run(self):
-        self.build_opencv()
+        #  self.build_opencv()
         for ext in self.extensions:
             self.build_cmake(ext)
             super().run()
@@ -36,6 +36,8 @@ class build_ext(build_ext_org):
         rootpth = os.getcwd()
         os.chdir('third_party/opencv')
         cwd = os.getcwd()
+        build_dir = './build'
+        if osp.exists(build_dir): shutil.rmtree(build_dir)
         os.makedirs('build')
         os.chdir('build')
         self.spawn(['cmake', '..', '-DCMAKE_BUILD_TYPE=RELEASE', '-DOPENCV_GENERATE_PKGCONFIG=ON', '-DWITH_TBB=ON', '-DBUILD_TBB=ON', '-GNinja'])

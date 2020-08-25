@@ -33,37 +33,13 @@ using cv::Mat;
 // functions of Batch
 Batch::Batch(vector<float> *dt, vector<int> dsz, vector<int64_t> *lbs, vector<int> lsz): data(dt), dsize(dsz), labels(lbs), lsize(lsz) {}
 
+
+
+
 /* 
- * functions of DataLoader */
-DataLoader::DataLoader(string rootpth, string fname, int bs,
-        vector<int> sz, bool nchw, bool train, bool shuffle, int n_workers, 
-        bool drop_last):batchsize(bs), nchw(nchw), shuffle(shuffle),
-        num_workers(n_workers), drop_last(drop_last) {
-    init(rootpth, fname, sz, train);
-}
-
-void DataLoader::init(string rootpth, string fname, vector<int> sz, bool train) {
-    height = sz[0];
-    width = sz[1];
-    pos = 0;
-    epoch = 0;
-
-    // dataset.init(rootpth, fname, {height, width}, nchw);
-    dataset = DataSet(rootpth, fname, {height, width}, train, nchw);
-    n_all_samples = dataset.get_n_samples();
-    n_samples = n_all_samples;
-    all_indices.resize(n_samples);
-    std::iota(all_indices.begin(), all_indices.end(), 0);
-    indices = all_indices;
-
-    thread_pool.init(1024, num_workers);
-}
-
-DataLoader::~DataLoader() {
-    stop_prefetcher();
-}
-
-Batch DataLoader::_get_batch() {
+ * methods for DataLoaderNP
+ *  */
+Batch DataLoaderNp::_get_batch() {
     // auto t1 = std::chrono::steady_clock::now();
     CHECK (!pos_end()) << "want more samples than n_samples, there can be some logical problem\n";
 
@@ -122,126 +98,11 @@ Batch DataLoader::_get_batch() {
 }
 
 
-void DataLoader::_shuffle() {
-    std::shuffle(indices.begin(), indices.end(), grandom.engine);
-}
-
-void DataLoader::_start() {
-    pos = 0;
-    if (is_dist) {
-        _split_by_rank();
-    } else {
-        if (shuffle) {
-            std::shuffle(indices.begin(), indices.end(), grandom.engine);
-        }
-    }
-    start_prefetcher();
-    ++epoch;
-}
-
-void DataLoader::_restart() {
-    pos = 0;
-    if (is_dist) {
-        _split_by_rank();
-    } else {
-        if (shuffle) {
-            std::shuffle(indices.begin(), indices.end(), grandom.engine);
-        }
-    }
-    prefetch_cond_var.notify_all();
-}
-
-bool DataLoader::_is_end() {
-    bool end{false};
-    if (pos_end() && data_pool.empty()) end = true;
-    return end;
-}
-
-void DataLoader::_set_epoch(int ep) {
-    epoch = ep;
-}
-
-void DataLoader::_init_dist(int rank, int num_ranks) {
-    is_dist = true;
-    this->rank = rank;
-    this->num_ranks = num_ranks;
-    this->n_samples = static_cast<int>(ceil((float)n_all_samples / num_ranks));
-    indices.resize(this->n_samples);
-}
-
-void DataLoader::_split_by_rank() {
-    if (shuffle) {
-        randeng.seed(epoch);
-        std::shuffle(all_indices.begin(), all_indices.end(), randeng);
-    }
-    int rank_pos = rank;
-    for (int i{0}; i < n_samples; ++i) {
-        indices[i] = all_indices[rank_pos];
-        rank_pos += num_ranks;
-        if (rank_pos >= n_all_samples) rank_pos = rank_pos % n_all_samples;
-    }
-}
-
-int64_t DataLoader::_get_ds_length() {
-    return static_cast<int64_t>(indices.size());
-}
-
-int64_t DataLoader::_get_n_batches() {
-    int64_t len = n_samples / batchsize;
-    if ((n_samples % batchsize != 0) && !drop_last) ++len;
-    return len;
-}
-
-void DataLoader::start_prefetcher() {
-    auto prefetch = [&]() {
-        // cout << "prefetch enter while loop \n";
-        while (true) {
-            if (pos_end() && !quit_prefetch) {
-                std::unique_lock<mutex> lock(prefetch_mtx);
-                prefetch_cond_var.wait(lock, [&] {return quit_prefetch || !pos_end();});
-            }
-            if (quit_prefetch) break;
-
-            data_pool.push(_get_batch());
-        }
-    };
-    th_prefetch = std::async(std::launch::async, prefetch);
-}
-
-
-void DataLoader::stop_prefetcher() {
-    quit_prefetch = true;
-    prefetch_cond_var.notify_all();
-    data_pool.abort();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    th_prefetch.get();
-}
-
-
-Batch DataLoader::_next_batch() {
-    return data_pool.get();
-}
-
-bool DataLoader::pos_end() {
-    bool end{false};
-    if ((pos >= n_samples) || ((pos + batchsize > n_samples) && drop_last)) {
-        end = true;
-        // if (pos >= n_samples)
-        //     cout << "pos >= n_samples" << endl;
-        // if ((pos + batchsize > n_samples) && drop_last)
-        //     cout << "(pos + batchsize > n_samples) && drop_last" << endl;
-        // cout << "pos: " << pos << endl;
-        // cout << "batchsize: " << batchsize << endl;
-        // cout << "n_samples: " << n_samples << endl;
-    }
-    return end;
-}
-
 //
 // int main () {
 //     string imroot("/data/zzy/imagenet/train/");
 //     string annfile("../grpc/train.txt");
-//     DataLoader dl(imroot, annfile, 128, {224, 224}, true, 4);
+//     BaseDataLoader dl(imroot, annfile, 128, {224, 224}, true, 4);
 //     for (int i{0}; i < 10; ++i) {
 //         cout << dl.dataset.img_paths[i] << endl;
 //     }
